@@ -189,6 +189,10 @@ body{font-family:var(--font);color:var(--dark);background:var(--white);line-heig
 .btn-primary:hover{background:#b55c3d;text-decoration:none}
 .btn-secondary{background:var(--dark);color:var(--white)}
 .btn-secondary:hover{background:#333;text-decoration:none}
+.btn-outline{border:2px solid var(--terracotta);color:var(--terracotta);background:transparent}
+.btn-outline:hover{background:var(--terracotta);color:var(--white);text-decoration:none}
+.badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:600;font-family:var(--mono)}
+.badge.green{background:rgba(61,163,77,.1);color:var(--green)}
 .btn-group{display:flex;gap:12px;margin:20px 0;flex-wrap:wrap}
 
 /* Category tag */
@@ -697,388 +701,24 @@ body{font-family:var(--font);color:var(--dark);background:var(--white);line-heig
   <h2><i data-lucide="download-cloud" style="width:24px;height:24px;vertical-align:middle;margin-right:6px"></i>Descarga de BlockCodigo</h2>
   <p>El motor completo de programación visual en un solo archivo JavaScript. Incluye registro de bloques, conversión IR, emisión multi-lenguaje y renderizado de elementos DOM.</p>
 
+  <div style="display:flex;gap:16px;align-items:center;margin-bottom:20px">
+    <span class="badge green">v0.1.0-alpha</span>
+    <span style="font-size:0.85rem;color:#888">Última actualización: Julio 2026</span>
+    <span style="font-size:0.85rem;color:#888">Tamaño: ~18 KB</span>
+  </div>
+
   <div class="btn-group">
-    <button class="btn btn-primary" onclick="downloadBlockCodigo()"><i data-lucide="download" style="width:16px;height:16px"></i> Descargar block-codigo.js</button>
+    <a href="blockcodigo.js" download class="btn btn-primary" style="display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:8px;font-weight:600;font-size:15px;text-decoration:none;transition:all .2s;border:none;cursor:pointer;background:#C96B4B;color:#fff">
+      <i data-lucide="download" style="width:18px;height:18px"></i> Descargar BlockCodigo (blockcodigo.js)
+    </a>
+    <a href="#" onclick="downloadDemo(); return false" class="btn btn-outline" style="display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:8px;font-weight:600;font-size:15px;text-decoration:none;transition:all .2s;border:2px solid #C96B4B;color:#C96B4B;background:transparent;cursor:pointer">
+      <i data-lucide="play-circle" style="width:18px;height:18px"></i> Descargar Demo Interactivo
+    </a>
   </div>
 
   <div class="code-block" style="margin-top:20px">
-    <div class="code-header"><span class="code-lang">JavaScript — block-codigo.js</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code id="bcSourceCode">/**
- * BlockCodigo — Visual Block Programming API
- * v0.1.0-alpha
- * Motor de programación visual para Libre Código
- *
- * Uso:
- *   &lt;script src="block-codigo.js"&gt;&lt;/script&gt;
- *   // Accede via globalThis.BlockCodigo
- */
-const BlockCodigo = (function () {
-  'use strict';
-
-  /* ─── State ────────────────────────────────────────────── */
-
-  const _blocks = new Map();
-  const _categories = new Map();
-  const _listeners = Object.create(null);
-  let _currentLanguage = 'javascript';
-  let _idCounter = 0;
-
-  /* ─── Default Categories ───────────────────────────────── */
-
-  const DEFAULT_CATEGORIES = [
-    { id: 'program',    label: 'Programa',      color: '#D97B2E', icon: 'play' },
-    { id: 'variables',  label: 'Variables',      color: '#9A9088', icon: 'box' },
-    { id: 'control',    label: 'Control',        color: '#C96B4B', icon: 'git-branch' },
-    { id: 'io',         label: 'Entrada/Salida', color: '#874418', icon: 'terminal' },
-    { id: 'math',       label: 'Matemáticas',    color: '#B85C24', icon: 'calculator' },
-    { id: 'strings',    label: 'Cadenas',        color: '#D97B2E', icon: 'type' },
-    { id: 'operators',  label: 'Operadores',     color: '#C96B4B', icon: 'equal' },
-    { id: 'arrays',     label: 'Arreglos',       color: '#874418', icon: 'list' },
-    { id: 'functions',  label: 'Funciones',      color: '#D97B2E', icon: 'lambda' },
-    { id: 'classes',    label: 'Clases',         color: '#C96B2C', icon: 'box' }
-  ];
-
-  DEFAULT_CATEGORIES.forEach(function (cat) {
-    _categories.set(cat.id, cat);
-  });
-
-  /* ─── Supported Languages ──────────────────────────────── */
-
-  const SUPPORTED_LANGUAGES = [
-    'javascript', 'python', 'typescript', 'java', 'csharp', 'cpp',
-    'c', 'ruby', 'go', 'rust', 'php', 'swift', 'kotlin',
-    'dart', 'r', 'lua', 'haskell', 'elixir', 'scala', 'julia', 'pseudocode'
-  ];
-
-  /* ─── Language Emitter Maps ─────────────────────────────── */
-
-  const _emitters = {
-    javascript: {
-      print: function (msg) { return 'console.log(' + msg + ');'; },
-      variable: function (name, val) { return 'let ' + name + ' = ' + val + ';'; },
-      assign: function (name, val) { return name + ' = ' + val + ';'; },
-      if: function (cond, body) { return 'if (' + cond + ') {\n' + _indent(body) + '\n}'; },
-      forLoop: function (varName, from, to, body) {
-        return 'for (let ' + varName + ' = ' + from + '; ' + varName + ' &lt; ' + to + '; ' + varName + '++) {\n' + _indent(body) + '\n}';
-      },
-      whileLoop: function (cond, body) { return 'while (' + cond + ') {\n' + _indent(body) + '\n}'; },
-      functionDef: function (name, params, body) {
-        return 'function ' + name + '(' + params.join(', ') + ') {\n' + _indent(body) + '\n}';
-      },
-      functionCall: function (name, args) { return name + '(' + args.join(', ') + ');'; },
-      returnVal: function (val) { return 'return ' + val + ';'; },
-      arithmetic: function (op, left, right) { return '(' + left + ' ' + op + ' ' + right + ')'; },
-      comparison: function (op, left, right) { return '(' + left + ' ' + op + ' ' + right + ')'; },
-      classDef: function (name, body) { return 'class ' + name + ' {\n' + _indent(body) + '\n}'; },
-      arrayCreate: function (items) { return '[' + items.join(', ') + ']'; },
-      arrayGet: function (arr, idx) { return arr + '[' + idx + ']'; },
-      stringConcat: function (parts) { return parts.join(' + '); },
-      stringLength: function (str) { return str + '.length'; }
-    },
-    python: {
-      print: function (msg) { return 'print(' + msg + ')'; },
-      variable: function (name, val) { return name + ' = ' + val; },
-      assign: function (name, val) { return name + ' = ' + val; },
-      if: function (cond, body) { return 'if ' + cond + ':\n' + _indent(body); },
-      forLoop: function (varName, from, to, body) {
-        return 'for ' + varName + ' in range(' + from + ', ' + to + '):\n' + _indent(body);
-      },
-      whileLoop: function (cond, body) { return 'while ' + cond + ':\n' + _indent(body); },
-      functionDef: function (name, params, body) {
-        return 'def ' + name + '(' + params.join(', ') + '):\n' + _indent(body);
-      },
-      functionCall: function (name, args) { return name + '(' + args.join(', ') + ')'; },
-      returnVal: function (val) { return 'return ' + val; },
-      arithmetic: function (op, left, right) { return '(' + left + ' ' + op + ' ' + right + ')'; },
-      comparison: function (op, left, right) { return left + ' ' + op + ' ' + right; },
-      classDef: function (name, body) { return 'class ' + name + ':\n' + _indent(body); },
-      arrayCreate: function (items) { return '[' + items.join(', ') + ']'; },
-      arrayGet: function (arr, idx) { return arr + '[' + idx + ']'; },
-      stringConcat: function (parts) { return ' + '.join(parts); },
-      stringLength: function (str) { return 'len(' + str + ')'; }
-    },
-    typescript: {
-      print: function (msg) { return 'console.log(' + msg + ');'; },
-      variable: function (name, val) { return 'const ' + name + ' = ' + val + ';'; },
-      assign: function (name, val) { return name + ' = ' + val + ';'; },
-      if: function (cond, body) { return 'if (' + cond + ') {\n' + _indent(body) + '\n}'; },
-      forLoop: function (varName, from, to, body) {
-        return 'for (let ' + varName + ': number = ' + from + '; ' + varName + ' &lt; ' + to + '; ' + varName + '++) {\n' + _indent(body) + '\n}';
-      },
-      whileLoop: function (cond, body) { return 'while (' + cond + ') {\n' + _indent(body) + '\n}'; },
-      functionDef: function (name, params, body) {
-        return 'function ' + name + '(' + params.join(', ') + '): void {\n' + _indent(body) + '\n}';
-      },
-      functionCall: function (name, args) { return name + '(' + args.join(', ') + ');'; },
-      returnVal: function (val) { return 'return ' + val + ';'; },
-      arithmetic: function (op, left, right) { return '(' + left + ' ' + op + ' ' + right + ')'; },
-      comparison: function (op, left, right) { return '(' + left + ' ' + op + ' ' + right + ')'; },
-      classDef: function (name, body) { return 'class ' + name + ' {\n' + _indent(body) + '\n}'; },
-      arrayCreate: function (items) { return '[' + items.join(', ') + ']'; },
-      arrayGet: function (arr, idx) { return arr + '[' + idx + ']'; },
-      stringConcat: function (parts) { return parts.join(' + '); },
-      stringLength: function (str) { return str + '.length'; }
-    }
-  };
-
-  function _indent(code) {
-    return code.split('\n').map(function (line) { return '  ' + line; }).join('\n');
-  }
-
-  /* ─── Events ───────────────────────────────────────────── */
-
-  function _on(event, callback) {
-    if (!_listeners[event]) _listeners[event] = [];
-    _listeners[event].push(callback);
-    return {
-      dispose: function () {
-        var idx = _listeners[event].indexOf(callback);
-        if (idx !== -1) _listeners[event].splice(idx, 1);
-      }
-    };
-  }
-
-  function _emit(event, data) {
-    var list = _listeners[event];
-    if (!list) return;
-    for (var i = 0; i &lt; list.length; i++) {
-      try { list[i](data); } catch (e) { console.error('[BlockCodigo] Event error:', e); }
-    }
-  }
-
-  /* ─── API ──────────────────────────────────────────────── */
-
-  return {
-    version: '0.1.0-alpha',
-
-    /* ── Registration ── */
-
-    registerBlock: function (def) {
-      if (!def || typeof def !== 'object') throw new Error('[BlockCodigo] Block definition must be an object');
-      if (!def.id || typeof def.id !== 'string') throw new Error('[BlockCodigo] Block id must be a string');
-      if (!def.label || typeof def.label !== 'string') throw new Error('[BlockCodigo] Block label must be a string');
-      if (!def.category || !_categories.has(def.category)) {
-        throw new Error('[BlockCodigo] Invalid category: ' + def.category);
-      }
-      if (['hat', 'stack', 'reporter', 'boolean', 'c-block'].indexOf(def.shape) === -1) {
-        throw new Error('[BlockCodigo] Invalid shape: ' + def.shape);
-      }
-      var block = Object.assign({
-        ports: [],
-        tooltip: '',
-        toCode: function () { return ''; },
-        fromCode: function () { return {}; }
-      }, def);
-      _blocks.set(block.id, block);
-      _emit('block-registered', { id: block.id, block: block });
-      return block;
-    },
-
-    registerCategory: function (cat) {
-      if (!cat || !cat.id || !cat.label || !cat.color) {
-        throw new Error('[BlockCodigo] Category requires id, label, and color');
-      }
-      _categories.set(cat.id, cat);
-      _emit('category-registered', { id: cat.id });
-    },
-
-    getBlock: function (id) {
-      return _blocks.has(id) ? Object.assign({}, _blocks.get(id)) : null;
-    },
-
-    getAllBlocks: function () {
-      var result = [];
-      _blocks.forEach(function (block) { result.push(Object.assign({}, block)); });
-      return result;
-    },
-
-    getBlocksByCategory: function (catId) {
-      var result = [];
-      _blocks.forEach(function (block) {
-        if (block.category === catId) result.push(Object.assign({}, block));
-      });
-      return result;
-    },
-
-    getCategories: function () {
-      var result = [];
-      _categories.forEach(function (cat) { result.push(Object.assign({}, cat)); });
-      return result;
-    },
-
-    /* ── Language ── */
-
-    getLanguage: function () { return _currentLanguage; },
-
-    setLanguage: function (lang) {
-      if (SUPPORTED_LANGUAGES.indexOf(lang) === -1) {
-        throw new Error('[BlockCodigo] Unsupported language: ' + lang + '. Supported: ' + SUPPORTED_LANGUAGES.join(', '));
-      }
-      var prev = _currentLanguage;
-      _currentLanguage = lang;
-      _emit('language-changed', { language: lang, previous: prev });
-    },
-
-    getSupportedLanguages: function () { return SUPPORTED_LANGUAGES.slice(); },
-
-    /* ── Conversion ── */
-
-    convertCodeToBlocks: function (code, language) {
-      var lang = language || _currentLanguage;
-      if (typeof code !== 'string') throw new Error('[BlockCodigo] Code must be a string');
-      var blocks = [];
-      var lines = code.split('\n');
-      for (var i = 0; i &lt; lines.length; i++) {
-        var line = lines[i].trim();
-        if (line === '') continue;
-        var detected = _detectBlockFromLine(line);
-        if (detected) blocks.push(detected);
-      }
-      _emit('code-converted', { code: code, language: lang, blocks: blocks });
-      return blocks;
-    },
-
-    convertBlocksToCode: function (blocks, language) {
-      var lang = language || _currentLanguage;
-      if (!Array.isArray(blocks)) throw new Error('[BlockCodigo] blocks must be an array');
-      var emitter = _emitters[lang] || _emitters['javascript'];
-      var lines = [];
-      for (var i = 0; i &lt; blocks.length; i++) {
-        var block = blocks[i];
-        var def = _blocks.get(block.blockId || block.id);
-        if (def &amp;&amp; typeof def.toCode === 'function') {
-          var codeLine = def.toCode(block);
-          if (codeLine) lines.push(codeLine);
-        }
-      }
-      var result = lines.join('\n');
-      _emit('blocks-converted', { blocks: blocks, language: lang, code: result });
-      return result;
-    },
-
-    /* ── DOM Rendering ── */
-
-    createBlockElement: function (blockDef) {
-      if (!blockDef || !blockDef.shape) return null;
-      var el = document.createElement('div');
-      el.className = 'bc-block bc-block--' + blockDef.shape;
-      el.dataset.blockId = blockDef.id;
-      el.style.cssText = 'display:inline-flex;align-items:center;gap:8px;padding:10px 18px;font-family:Inter,sans-serif;font-size:14px;font-weight:500;border-radius:6px;cursor:grab;user-select:none;';
-
-      switch (blockDef.shape) {
-        case 'hat':
-          el.style.background = blockDef.color || '#F0B429';
-          el.style.color = '#222';
-          el.style.borderRadius = '20px 20px 6px 6px';
-          break;
-        case 'stack':
-          el.style.border = '3px solid ' + (blockDef.color || '#C96B4B');
-          el.style.background = (blockDef.color || '#C96B4B') + '10';
-          el.style.color = '#222';
-          break;
-        case 'reporter':
-          el.style.background = '#F5E6C8';
-          el.style.border = '2px solid #c4a97d';
-          el.style.color = '#222';
-          el.style.borderRadius = '20px';
-          break;
-        case 'boolean':
-          el.style.background = '#3DA34D';
-          el.style.color = '#fff';
-          el.style.clipPath = 'polygon(12px 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0 50%)';
-          el.style.padding = '10px 24px';
-          break;
-        case 'c-block':
-          el.style.border = '3px solid ' + (blockDef.color || '#7B61FF');
-          el.style.background = (blockDef.color || '#7B61FF') + '10';
-          el.style.borderRadius = '8px';
-          el.style.flexDirection = 'column';
-          el.style.alignItems = 'stretch';
-          break;
-      }
-
-      var label = document.createElement('span');
-      label.textContent = blockDef.label;
-      el.appendChild(label);
-
-      if (blockDef.ports) {
-        blockDef.ports.forEach(function (port) {
-          var portEl = document.createElement('span');
-          portEl.className = 'bc-port';
-          portEl.dataset.portId = port.id;
-          portEl.textContent = port.label || port.id;
-          portEl.style.cssText = 'background:#fff;border:2px solid ' + (blockDef.color || '#C96B4B') + ';border-radius:4px;padding:4px 12px;font-family:"JetBrains Mono",monospace;font-size:12px;min-width:60px;';
-          el.appendChild(portEl);
-        });
-      }
-
-      _emit('block-rendered', { id: blockDef.id, element: el });
-      return el;
-    },
-
-    /* ── Events ── */
-
-    on: function (event, callback) { return _on(event, callback); },
-
-    emit: function (event, data) { _emit(event, data); }
-  };
-
-  /* ─── Helpers (private) ─────────────────────────────────── */
-
-  function _detectBlockFromLine(line) {
-    var result = { id: _uid(), ports: {} };
-
-    if (/console\.log|print\(|puts |println|System\.out/.test(line)) {
-      var msgMatch = line.match(/(?:console\.log|print|puts|println|System\.out\.println)\s*\(\s*(.+?)\s*\)/);
-      result.blockId = 'print';
-      if (msgMatch) result.ports.message = msgMatch[1];
-      return result;
-    }
-    if (/^for\s*\(/.test(line) || /^for\s+\w+\s+in\s+range/.test(line)) {
-      result.blockId = 'forLoop';
-      return result;
-    }
-    if (/^while\s*[\(]/.test(line)) {
-      result.blockId = 'whileLoop';
-      return result;
-    }
-    if (/^if\s*[\(]/.test(line) || /^if\s+\w/.test(line)) {
-      result.blockId = 'ifCondition';
-      return result;
-    }
-    if (/^(let|const|var|int|string|float)\s+\w+\s*=/.test(line)) {
-      result.blockId = 'variable';
-      var varMatch = line.match(/(?:let|const|var|int|string|float)\s+(\w+)\s*=\s*(.+)/);
-      if (varMatch) { result.ports.name = varMatch[1]; result.ports.value = varMatch[2]; }
-      return result;
-    }
-    if (/function\s+\w+|def\s+\w+/.test(line)) {
-      result.blockId = 'functionDef';
-      return result;
-    }
-    if (/return\s+/.test(line)) {
-      result.blockId = 'returnVal';
-      var retMatch = line.match(/return\s+(.+)/);
-      if (retMatch) result.ports.value = retMatch[1];
-      return result;
-    }
-    if (/class\s+\w+/.test(line)) {
-      result.blockId = 'classDef';
-      return result;
-    }
-    result.blockId = 'unknown';
-    result.ports.code = line;
-    return result;
-  }
-
-  function _uid() { return 'bc_' + (++_idCounter); }
-
-})();
-
-/* Export for module environments */
-if (typeof module !== 'undefined' &amp;&amp; module.exports) {
-  module.exports = BlockCodigo;
-}</code></pre>
+    <div class="code-header"><span class="code-lang">JavaScript — blockcodigo.js</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+    <pre style="background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:12px;overflow-x:auto;font-size:13px;line-height:1.6;max-height:500px;overflow-y:auto"><code id="api-code-display">Cargando...</code></pre>
   </div>
 </section>
 
@@ -1126,16 +766,116 @@ function copyCode(btn){
     setTimeout(function(){btn.textContent='Copiar'},1500);
   });
 }
+</script>
 
-/* Download BlockCodigo */
-function downloadBlockCodigo(){
-  var code=document.getElementById('bcSourceCode').textContent;
-  var blob=new Blob([code],{type:'application/javascript'});
-  var url=URL.createObjectURL(blob);
-  var a=document.createElement('a');
-  a.href=url;a.download='block-codigo.js';
-  document.body.appendChild(a);a.click();
-  document.body.removeChild(a);URL.revokeObjectURL(url);
+<script>
+fetch('blockcodigo.js')
+  .then(r => r.text())
+  .then(code => {
+    document.getElementById('api-code-display').textContent = code;
+  });
+</script>
+
+<script>
+async function downloadDemo() {
+  const libCode = await fetch('blockcodigo.js').then(r => r.text());
+  const demoHtml = `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>BlockCodigo Demo</title>
+  <style>
+    body { font-family: Inter, sans-serif; background: #FFFCF5; margin: 0; padding: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .palette { width: 240px; float: left; background: #fff; border-radius: 12px; padding: 16px; border: 1px solid #eee; }
+    .canvas { margin-left: 260px; min-height: 600px; background: #FAF3E6; border-radius: 12px; border: 1px solid #eee; }
+    .code-output { margin-top: 20px; background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 12px; font-family: monospace; font-size: 13px; white-space: pre-wrap; }
+    h1 { font-size: 24px; color: #1F2937; margin-bottom: 8px; }
+    p { color: #888; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>BlockCodigo Demo</h1>
+    <p>Arrastra bloques desde la paleta al canvas. Haz clic en "Generar Código" para ver el resultado.</p>
+    <div class="palette" id="palette"></div>
+    <div class="canvas" id="canvas"></div>
+    <div class="code-output" id="output">// El código generado aparecerá aquí</div>
+    <button onclick="generateCode()" style="margin-top:16px;padding:10px 24px;background:#C96B4B;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600">Generar Código</button>
+    <button onclick="clearCanvas()" style="margin-top:16px;margin-left:8px;padding:10px 24px;background:#fff;color:#1F2937;border:1px solid #ddd;border-radius:8px;cursor:pointer;font-size:14px">Limpiar</button>
+  </div>
+  <script>
+    ${libCode}
+    
+    var canvasNodes = [];
+    var canvasEdges = [];
+    
+    // Render palette
+    BlockCodigo.renderPalette(document.getElementById('palette'));
+    
+    // Canvas drop handler
+    var canvas = document.getElementById('canvas');
+    canvas.addEventListener('dragover', function(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
+    canvas.addEventListener('drop', function(e) {
+      e.preventDefault();
+      var blockId = e.dataTransfer.getData('text/plain');
+      var rect = canvas.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      var y = e.clientY - rect.top;
+      var node = BlockCodigo.createBlockInstance(blockId, { x: x, y: y });
+      canvasNodes.push(node);
+      
+      // Connect to previous
+      if (canvasNodes.length > 1) {
+        canvasEdges.push({
+          id: 'e-' + canvasNodes[canvasNodes.length - 2].id + '-' + node.id,
+          source: canvasNodes[canvasNodes.length - 2].id,
+          target: node.id,
+          sourceHandle: 'next', targetHandle: 'prev'
+        });
+      }
+      
+      BlockCodigo.renderBlocks(canvas, canvasNodes, canvasEdges);
+    });
+    
+    function generateCode() {
+      var ir = BlockCodigo.convertBlocksToIR(canvasNodes, canvasEdges);
+      // Simple emitter for demo
+      var code = '';
+      ir.stmts.forEach(function(stmt) {
+        switch(stmt.kind) {
+          case 'print': code += 'console.log(' + BlockCodigo.exprToSource(stmt.args[0]) + ');\\n'; break;
+          case 'varDecl': code += 'var ' + stmt.name + ' = ' + BlockCodigo.exprToSource(stmt.value) + ';\\n'; break;
+          case 'funcCall': code += stmt.name + '(' + stmt.args.map(BlockCodigo.exprToSource).join(', ') + ');\\n'; break;
+          case 'funcDef': code += 'function ' + stmt.name + '(' + stmt.params.map(function(p){return p.name}).join(', ') + ') {\\n}\\n'; break;
+          case 'classDef': code += 'class ' + stmt.name + (stmt.superClass ? ' extends ' + stmt.superClass : '') + ' {\\n}\\n'; break;
+          case 'ifElse': code += 'if (' + BlockCodigo.exprToSource(stmt.condition) + ') {\\n}\\n'; break;
+          case 'whileLoop': code += 'while (' + BlockCodigo.exprToSource(stmt.condition) + ') {\\n}\\n'; break;
+          case 'forLoop': code += 'for (var ' + stmt.init.name + ' = ' + BlockCodigo.exprToSource(stmt.init.value) + '; ...) {\\n}\\n'; break;
+          case 'return': code += 'return' + (stmt.value ? ' ' + BlockCodigo.exprToSource(stmt.value) : '') + ';\\n'; break;
+          default: code += '/* ' + stmt.kind + ' */\\n';
+        }
+      });
+      document.getElementById('output').textContent = code || '// Agrega bloques al canvas primero';
+    }
+    
+    function clearCanvas() {
+      canvasNodes = [];
+      canvasEdges = [];
+      BlockCodigo.renderBlocks(document.getElementById('canvas'), [], []);
+      document.getElementById('output').textContent = '// El código generado aparecerá aquí';
+    }
+  <\/script>
+</body>
+</html>`;
+  
+  const blob = new Blob([demoHtml], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'blockcodigo-demo.html';
+  a.click();
+  URL.revokeObjectURL(url);
 }
 </script>
 </body>

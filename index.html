@@ -401,44 +401,33 @@ footer ul a:hover{color:var(--accent)}
     <div class="section-label fade-in">Plugins</div>
     <h2 class="section-title fade-in">Extiende Libre Código</h2>
     <p class="section-subtitle fade-in">Comunidad y equipo oficial comparten plugins para potenciar tu experiencia de desarrollo.</p>
-    <div class="plugin-grid fade-in">
-      <div class="card plugin-card">
-        <div>
-          <span class="tag official">Oficial</span>
-          <h3>Python Linter</h3>
-          <p class="desc">Análisis estático en tiempo real para código Python. Detecta errores, estilo y sugerencias de mejora mientras escribes.</p>
-          <div class="plugin-meta"><span>v1.0</span><span>Libre Código Team</span></div>
-        </div>
-        <button class="btn btn-outline btn-sm"><i data-lucide="download" style="width:14px;height:14px"></i> Descargar</button>
-      </div>
-      <div class="card plugin-card">
-        <div>
-          <span class="tag community">Comunidad</span>
-          <h3>Git Integration</h3>
-          <p class="desc">Control de versiones integrado. Clona, commitea y haz push desde la interfaz visual de Libre Código.</p>
-          <div class="plugin-meta"><span>v0.3</span><span>Community</span></div>
-        </div>
-        <button class="btn btn-outline btn-sm"><i data-lucide="download" style="width:14px;height:14px"></i> Descargar</button>
-      </div>
-      <div class="card plugin-card">
-        <div>
-          <span class="tag official">Oficial</span>
-          <h3>Theme Pack</h3>
-          <p class="desc">Colección de 12 temas visuales para personalizar la apariencia del editor y los bloques.</p>
-          <div class="plugin-meta"><span>v1.2</span><span>Libre Código Team</span></div>
-        </div>
-        <button class="btn btn-outline btn-sm"><i data-lucide="download" style="width:14px;height:14px"></i> Descargar</button>
-      </div>
-      <div class="card plugin-card">
-        <div>
-          <span class="tag community">Comunidad</span>
-          <h3>SQL Connector</h3>
-          <p class="desc">Conecta bases de datos SQL (SQLite, PostgreSQL) y gestiona consultas desde bloques visuales.</p>
-          <div class="plugin-meta"><span>v0.1</span><span>Community</span></div>
-        </div>
-        <button class="btn btn-outline btn-sm"><i data-lucide="download" style="width:14px;height:14px"></i> Descargar</button>
-      </div>
+    <div class="plugin-grid fade-in" id="pluginGrid">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:#888;font-size:14px">Cargando plugins de la comunidad...</div>
     </div>
+    <script>
+    (async function() {
+      const grid = document.getElementById('pluginGrid');
+      try {
+        const res = await fetch('api/posts');
+        const data = await res.json();
+        const posts = (data.posts || []).filter(p => p.fileName);
+        if (posts.length === 0) {
+          grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px"><p style="color:#888;font-size:14px;margin-bottom:12px">Aún no hay plugins publicados.</p><a href="#foro" class="btn btn-primary btn-sm" style="text-decoration:none"><i data-lucide="upload" style="width:14px;height:14px"></i> Sé el primero en publicar</a></div>';
+          if (typeof lucide !== 'undefined') lucide.createIcons();
+          return;
+        }
+        grid.innerHTML = posts.slice(0, 8).map(p => {
+          const date = new Date(p.createdAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+          const catColors = { plugin: '#C96B4B', theme: '#8B5CF6', tool: '#059669', snippet: '#F0B429', otro: '#6B7280' };
+          return '<div class="card plugin-card"><div><span class="tag community" style="background:' + (catColors[p.category] || '#6B7280') + '20;color:' + (catColors[p.category] || '#6B7280') + '">' + escH(p.category || 'plugin') + '</span><h3>' + escH(p.title) + '</h3><p class="desc">' + escH(p.description || '').substring(0, 100) + '</p><div class="plugin-meta"><span>v' + escH(p.author) + '</span><span>' + date + '</span><span>⬇ ' + (p.downloads || 0) + '</span><span>❤ ' + (p.likes || 0) + '</span></div></div><a href="api/posts/' + p.id + '/download" class="btn btn-outline btn-sm" style="text-decoration:none"><i data-lucide="download" style="width:14px;height:14px"></i> Descargar</a></div>';
+        }).join('');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+      } catch (e) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#888;font-size:14px">Inicia el servidor para ver los plugins: <code>npm start</code></div>';
+      }
+      function escH(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+    })();
+    </script>
   </div>
 </section>
 
@@ -543,72 +532,37 @@ footer ul a:hover{color:var(--accent)}
       <div>
         <div class="section-label fade-in">Foro de Plugins</div>
         <h2 class="section-title fade-in">Comparte y descubre plugins</h2>
+        <p class="section-subtitle fade-in" style="margin:0">Tu PC es el servidor. Publica, descarga y comenta plugins de la comunidad.</p>
       </div>
       <button class="btn btn-primary fade-in" id="openModalBtn"><i data-lucide="plus" style="width:18px;height:18px"></i> Crear Publicación</button>
     </div>
-
-    <div class="forum-post fade-in">
-      <div class="forum-header">
-        <h3>Calculadora Científica</h3>
-      </div>
-      <div class="forum-meta">Publicado por <strong>AnaDev</strong> · 15 Jul 2026 · 12 descargas</div>
-      <p>Plugin que añade un bloque de calculadora científica con funciones trigonométricas, logarítmicas y estadísticas. Compatible con Python y JavaScript.</p>
-      <div class="forum-actions">
-        <button class="btn btn-outline btn-sm"><i data-lucide="download" style="width:14px;height:14px"></i> Descargar</button>
-        <button onclick="toggleComments(this)"><i data-lucide="message-circle" style="width:14px;height:14px"></i> 2 Comentarios</button>
-      </div>
-      <div class="comments" style="display:none">
-        <div class="comment"><strong>CarlosP</strong><span>16 Jul 2026</span><p>¡Excelente plugin! Funciona perfecto en Python. ¿Tienen planes de agregar cálculo numérico?</p></div>
-        <div class="comment"><strong>AnaDev</strong><span>16 Jul 2026</span><p>¡Gracias! Sí, el próximo release incluirá integración numérica y diferenciación.</p></div>
-      </div>
-    </div>
-
-    <div class="forum-post fade-in">
-      <div class="forum-header">
-        <h3>JSON Formatter</h3>
-      </div>
-      <div class="forum-meta">Publicado por <strong>DevMaster99</strong> · 12 Jul 2026 · 34 descargas</div>
-      <p>Formatea, valida y transforma datos JSON directamente desde bloques visuales. Incluye bloques para parseo, validación de esquemas y conversión a CSV.</p>
-      <div class="forum-actions">
-        <button class="btn btn-outline btn-sm"><i data-lucide="download" style="width:14px;height:14px"></i> Descargar</button>
-        <button onclick="toggleComments(this)"><i data-lucide="message-circle" style="width:14px;height:14px"></i> 2 Comentarios</button>
-      </div>
-      <div class="comments" style="display:none">
-        <div class="comment"><strong>MariaL</strong><span>13 Jul 2026</span><p>Lo uso a diario. ¿Sería posible añadir soporte para JSON Lines?</p></div>
-        <div class="comment"><strong>DevMaster99</strong><span>14 Jul 2026</span><p>Buena idea. Lo agrego al roadmap para la v0.2.</p></div>
-      </div>
-    </div>
-
-    <div class="forum-post fade-in">
-      <div class="forum-header">
-        <h3>HTTP Request Block</h3>
-      </div>
-      <div class="forum-meta">Publicado por <strong>ApiFan</strong> · 8 Jul 2026 · 21 descargas</div>
-      <p>Bloque visual para realizar peticiones HTTP (GET, POST, PUT, DELETE). Incluye soporte para headers, autenticación Bearer y manejo de respuestas JSON.</p>
-      <div class="forum-actions">
-        <button class="btn btn-outline btn-sm"><i data-lucide="download" style="width:14px;height:14px"></i> Descargar</button>
-        <button onclick="toggleComments(this)"><i data-lucide="message-circle" style="width:14px;height:14px"></i> 2 Comentarios</button>
-      </div>
-      <div class="comments" style="display:none">
-        <div class="comment"><strong>WebDev_Sam</strong><span>9 Jul 2026</span><p>Funciona genial para prototipos de APIs. ¿Puede soportar WebSockets?</p></div>
-        <div class="comment"><strong>ApiFan</strong><span>10 Jul 2026</span><p>WebSockets está en desarrollo. Estará listo para la próxima versión.</p></div>
-      </div>
-    </div>
+    <div id="forumStats" style="display:flex;gap:20px;margin-bottom:20px;font-size:13px;color:#888"></div>
+    <div id="forumPosts"><div style="text-align:center;padding:40px;color:#888">Cargando publicaciones...</div></div>
   </div>
 </section>
 
-<!-- MODAL -->
+<!-- MODAL CREAR PUBLICACIÓN -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <h2>Crear Publicación</h2>
-    <label for="postTitle">Título</label>
-    <input type="text" id="postTitle" placeholder="Nombre del plugin">
-    <label for="postAuthor">Autor</label>
+    <label for="postTitle">Título del Plugin</label>
+    <input type="text" id="postTitle" placeholder="Nombre de tu plugin">
+    <label for="postAuthor">Tu nombre</label>
     <input type="text" id="postAuthor" placeholder="Tu nombre o usuario">
+    <label for="postCategory">Categoría</label>
+    <select id="postCategory" style="padding:10px;border:1px solid #eee;border-radius:8px;font-size:14px;width:100%">
+      <option value="plugin">Plugin</option>
+      <option value="theme">Tema</option>
+      <option value="tool">Herramienta</option>
+      <option value="snippet">Snippet</option>
+      <option value="otro">Otro</option>
+    </select>
     <label for="postDesc">Descripción</label>
-    <textarea id="postDesc" placeholder="Describe qué hace tu plugin..."></textarea>
-    <label for="postFile">Archivo del Plugin</label>
-    <input type="file" id="postFile" style="padding:8px 0">
+    <textarea id="postDesc" placeholder="Describe qué hace tu plugin, cómo se usa..." rows="4"></textarea>
+    <label for="postTags">Tags (separados por coma)</label>
+    <input type="text" id="postTags" placeholder="python, util, linter">
+    <label for="postFile">Archivo del Plugin (.js o .zip)</label>
+    <input type="file" id="postFile" accept=".js,.zip" style="padding:8px 0">
     <div class="modal-btns">
       <button class="btn btn-outline btn-sm" id="closeModalBtn">Cancelar</button>
       <button class="btn btn-primary btn-sm" id="submitPostBtn">Publicar</button>
@@ -717,6 +671,8 @@ footer ul a:hover{color:var(--accent)}
 </footer>
 
 <script>
+const API = window.location.origin;
+
 lucide.createIcons();
 
 const hamburger=document.getElementById('hamburgerBtn');
@@ -729,23 +685,153 @@ const observer=new IntersectionObserver((entries)=>{
 },{threshold:0.1});
 document.querySelectorAll('.fade-in').forEach(el=>observer.observe(el));
 
+// ── Modal ──
 document.getElementById('openModalBtn').addEventListener('click',()=>document.getElementById('modalOverlay').classList.add('active'));
 document.getElementById('closeModalBtn').addEventListener('click',()=>document.getElementById('modalOverlay').classList.remove('active'));
 document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('active')});
-document.getElementById('submitPostBtn').addEventListener('click',()=>{
-  const t=document.getElementById('postTitle').value.trim();
-  if(!t){alert('Ingresa un título');return}
-  document.getElementById('modalOverlay').classList.remove('active');
-  alert('Publicación creada: '+t);
-  document.getElementById('postTitle').value='';
-  document.getElementById('postAuthor').value='';
-  document.getElementById('postDesc').value='';
+
+// ── Submit Post ──
+document.getElementById('submitPostBtn').addEventListener('click', async () => {
+  const title = document.getElementById('postTitle').value.trim();
+  const author = document.getElementById('postAuthor').value.trim();
+  const description = document.getElementById('postDesc').value.trim();
+  const category = document.getElementById('postCategory').value;
+  const tags = document.getElementById('postTags').value.split(',').map(t => t.trim()).filter(Boolean);
+  const fileInput = document.getElementById('postFile');
+
+  if (!title) { alert('Ingresa un título'); return; }
+
+  const btn = document.getElementById('submitPostBtn');
+  btn.textContent = 'Publicando...';
+  btn.disabled = true;
+
+  const formData = new FormData();
+  formData.append('meta', JSON.stringify({ title, author, description, category, tags }));
+  if (fileInput.files[0]) formData.append('file', fileInput.files[0]);
+
+  try {
+    const res = await fetch(API + '/api/posts', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('modalOverlay').classList.remove('active');
+      document.getElementById('postTitle').value = '';
+      document.getElementById('postAuthor').value = '';
+      document.getElementById('postDesc').value = '';
+      document.getElementById('postTags').value = '';
+      document.getElementById('postFile').value = '';
+      loadForum();
+    } else {
+      alert('Error: ' + (data.error || 'Unknown'));
+    }
+  } catch (e) {
+    alert('Error de conexión. ¿Está corriendo el servidor? (npm start)');
+  }
+  btn.textContent = 'Publicar';
+  btn.disabled = false;
 });
 
-function toggleComments(btn){
-  const comments=btn.closest('.forum-post').querySelector('.comments');
-  comments.style.display=comments.style.display==='none'?'block':'none';
+// ── Load Forum ──
+async function loadForum() {
+  const container = document.getElementById('forumPosts');
+  const statsEl = document.getElementById('forumStats');
+
+  try {
+    const [postsRes, statsRes] = await Promise.all([
+      fetch(API + '/api/posts'),
+      fetch(API + '/api/stats'),
+    ]);
+    const postsData = await postsRes.json();
+    const statsData = await statsRes.json();
+    const posts = postsData.posts || [];
+
+    statsEl.innerHTML = '<span>📝 ' + statsData.total + ' publicaciones</span><span>⬇ ' + statsData.totalDownloads + ' descargas</span><span>💬 ' + statsData.totalComments + ' comentarios</span><span>👁 ' + statsData.totalViews + ' vistas</span>';
+
+    if (posts.length === 0) {
+      container.innerHTML = '<div style="text-align:center;padding:60px 20px;background:#FAF3E6;border-radius:12px;border:1px solid #E8DDD0"><p style="color:#666;font-size:16px;margin-bottom:8px">Aún no hay publicaciones</p><p style="color:#999;font-size:14px">Sé el primero en compartir un plugin</p></div>';
+      return;
+    }
+
+    container.innerHTML = posts.map(p => {
+      const date = new Date(p.createdAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+      const comments = (p.comments || []);
+      const hasFile = p.fileName ? true : false;
+      const catColors = { plugin: '#C96B4B', theme: '#8B5CF6', tool: '#059669', snippet: '#F0B429', otro: '#6B7280' };
+      const catColor = catColors[p.category] || '#6B7280';
+
+      return '<div class="forum-post fade-in" data-id="' + p.id + '">' +
+        '<div class="forum-header"><h3>' + escHtml(p.title) + '</h3>' +
+        '<span style="background:' + catColor + '20;color:' + catColor + ';padding:3px 10px;border-radius:12px;font-size:0.75rem;font-weight:600">' + escHtml(p.category || 'plugin') + '</span></div>' +
+        '<div class="forum-meta">Publicado por <strong>' + escHtml(p.author) + '</strong> · ' + date +
+        ' · ' + (p.downloads || 0) + ' descargas · ' + (p.views || 0) + ' vistas · ' + (p.likes || 0) + ' likes</div>' +
+        (p.description ? '<p>' + escHtml(p.description) + '</p>' : '') +
+        (p.tags && p.tags.length ? '<div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">' + p.tags.map(t => '<span style="background:#F0E6D8;padding:2px 8px;border-radius:10px;font-size:0.7rem;color:#888">' + escHtml(t) + '</span>').join('') + '</div>' : '') +
+        '<div class="forum-actions">' +
+        (hasFile ? '<a href="' + API + '/api/posts/' + p.id + '/download" class="btn btn-outline btn-sm" style="text-decoration:none"><i data-lucide="download" style="width:14px;height:14px"></i> Descargar (' + formatSize(p.fileSize) + ')</a>' : '') +
+        '<button onclick="likePost(\'' + p.id + '\')"><i data-lucide="heart" style="width:14px;height:14px"></i> ' + (p.likes || 0) + '</button>' +
+        '<button onclick="toggleComments(this)"><i data-lucide="message-circle" style="width:14px;height:14px"></i> ' + comments.length + ' Comentarios</button>' +
+        '<button onclick="viewSource(\'' + p.id + '\')"><i data-lucide="code" style="width:14px;height:14px"></i> Ver código</button>' +
+        '</div>' +
+        '<div class="comments" style="display:none">' +
+        comments.map(c => {
+          const cDate = new Date(c.createdAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+          return '<div class="comment"><strong>' + escHtml(c.author) + '</strong><span>' + cDate + '</span><p>' + escHtml(c.text) + '</p></div>';
+        }).join('') +
+        '<div style="display:flex;gap:8px;margin-top:8px"><input type="text" placeholder="Escribe un comentario..." style="flex:1;padding:8px 12px;border:1px solid #eee;border-radius:8px;font-size:12px" onkeydown="if(event.key===\'Enter\')addComment(\'' + p.id + '\',this)"><button class="btn btn-outline btn-sm" onclick="addComment(\'' + p.id + '\',this.previousElementSibling)">Enviar</button></div>' +
+        '</div></div>';
+    }).join('');
+
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  } catch (e) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:#888"><p>No se pudo conectar al servidor.</p><p style="margin-top:8px;font-size:13px">Ejecuta: <code style="background:#F0E6D8;padding:2px 8px;border-radius:4px">npm start</code></p></div>';
+  }
 }
+
+function escHtml(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+function formatSize(bytes) { if (!bytes) return ''; if (bytes < 1024) return bytes + ' B'; if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB'; return (bytes / 1048576).toFixed(1) + ' MB'; }
+
+function toggleComments(btn) {
+  const comments = btn.closest('.forum-post').querySelector('.comments');
+  comments.style.display = comments.style.display === 'none' ? 'block' : 'none';
+}
+
+async function likePost(id) {
+  try {
+    await fetch(API + '/api/posts/' + id + '/like', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+    loadForum();
+  } catch (e) {}
+}
+
+async function addComment(postId, input) {
+  const text = input.value.trim();
+  if (!text) return;
+  try {
+    await fetch(API + '/api/posts/' + postId + '/comment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, author: document.getElementById('postAuthor').value.trim() || 'Anónimo' }),
+    });
+    input.value = '';
+    loadForum();
+  } catch (e) { alert('Error al comentar'); }
+}
+
+async function viewSource(id) {
+  try {
+    const res = await fetch(API + '/api/posts/' + id);
+    const data = await res.json();
+    const post = data.post;
+    if (!post.fileName) { alert('Este plugin no tiene archivo adjunto'); return; }
+    const srcRes = await fetch(API + '/api/posts/' + id + '/download');
+    const blob = await srcRes.blob();
+    const text = await blob.text();
+    const w = window.open('', '_blank');
+    w.document.write('<html><head><title>' + escHtml(post.title) + ' — Código fuente</title><style>body{font-family:monospace;background:#1e1e1e;color:#d4d4d4;padding:20px;white-space:pre-wrap;font-size:13px;line-height:1.6}</style></head><body>' + text.replace(/</g, '&lt;') + '</body></html>');
+  } catch (e) { alert('Error al cargar código'); }
+}
+
+// ── Init ──
+loadForum();
 </script>
 </body>
 </html>

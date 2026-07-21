@@ -609,348 +609,24 @@ LibreCodigo.<span class="fn">onEvent</span>(<span class="str">'code-change'</spa
   <h2><i data-lucide="download-cloud" style="width:24px;height:24px;vertical-align:middle;margin-right:6px"></i>Descarga del SDK</h2>
   <p>El SDK completo en un solo archivo JavaScript. Copia, descarga e inclúyelo en tu plugin.</p>
 
+  <div style="display:flex;gap:16px;align-items:center;margin-bottom:20px">
+    <span class="badge green" style="display:inline-block;padding:4px 12px;border-radius:20px;background:rgba(46,160,67,.12);color:#2ea043;font-size:13px;font-weight:600">v0.1.0-alpha</span>
+    <span style="font-size:0.85rem;color:#888">Última actualización: Julio 2026</span>
+    <span style="font-size:0.85rem;color:#888">Tamaño: ~12 KB</span>
+  </div>
+
   <div class="btn-group">
-    <button class="btn btn-primary" onclick="downloadSDK()"><i data-lucide="download" style="width:16px;height:16px"></i> Descargar libre-codigo-sdk.js</button>
+    <a href="libre-codigo-sdk.js" download class="btn btn-primary" style="display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:8px;font-weight:600;font-size:15px;text-decoration:none;transition:all .2s;background:var(--terracotta);color:var(--white)">
+      <i data-lucide="download" style="width:18px;height:18px"></i> Descargar SDK (libre-codigo-sdk.js)
+    </a>
+    <a href="#" onclick="downloadSDKZip(); return false" class="btn btn-outline" style="display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:8px;font-weight:600;font-size:15px;text-decoration:none;transition:all .2s;border:2px solid var(--dark);color:var(--dark);background:transparent">
+      <i data-lucide="package" style="width:18px;height:18px"></i> Descargar Paquete SDK
+    </a>
   </div>
 
   <div class="code-block" style="margin-top:20px">
     <div class="code-header"><span class="code-lang">JavaScript — libre-codigo-sdk.js</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
-    <pre><code id="sdkSourceCode">/**
- * Libre Código Plugin SDK v0.1.0-alpha
- * API completa para la extensión de Libre Código IDE
- * https://librecodigo.org
- *
- * Uso:
- *   &lt;script src="libre-codigo-sdk.js"&gt;&lt;/script&gt;
- *   // Luego accede a la API via globalThis.LibreCodigo
- */
-(function (global) {
-  'use strict';
-
-  const VERSION = '0.1.0-alpha';
-
-  /* ─── State ─────────────────────────────────────────────── */
-
-  const _events = Object.create(null);
-  const _commands = Object.create(null);
-  const _panels = Object.create(null);
-  const _blocks = [];
-  const _themes = Object.create(null);
-  let _idCounter = 0;
-
-  /* ─── Helpers ───────────────────────────────────────────── */
-
-  function _uid() { return '_sdk_' + (++_idCounter); }
-
-  function _on(event, callback) {
-    if (!_events[event]) _events[event] = [];
-    _events[event].push(callback);
-    return {
-      dispose: function () {
-        const idx = _events[event].indexOf(callback);
-        if (idx !== -1) _events[event].splice(idx, 1);
-      }
-    };
-  }
-
-  function _emit(event, data) {
-    const listeners = _events[event];
-    if (!listeners) return;
-    for (let i = 0; i &lt; listeners.length; i++) {
-      try { listeners[i](data); } catch (e) { console.error('[SDK] Event error:', e); }
-    }
-  }
-
-  function _assertStr(v, name) {
-    if (typeof v !== 'string' || v.trim() === '') {
-      throw new Error('[SDK] ' + name + ' must be a non-empty string');
-    }
-  }
-
-  function _assertFn(v, name) {
-    if (typeof v !== 'function') {
-      throw new Error('[SDK] ' + name + ' must be a function');
-    }
-  }
-
-  /* ─── Mock / Bridge APIs ────────────────────────────────── */
-
-  function _getMonaco() {
-    if (global.monaco) return global.monaco;
-    if (global.editor &amp;&amp; typeof global.editor.getValue === 'function') return global.editor;
-    console.warn('[SDK] Monaco editor not found. Returning mock.');
-    return {
-      getValue: function () { return ''; },
-      setValue: function () {},
-      getModel: function () {
-        return { getValue: function () { return ''; }, setValue: function () {} };
-      },
-      updateOptions: function () {}
-    };
-  }
-
-  function _getFs() {
-    if (global.LibreCodigo &amp;&amp; global.LibreCodigo.__fs) return global.LibreCodigo.__fs;
-    console.warn('[SDK] Filesystem bridge not available.');
-    return {
-      readFile: function () { return Promise.resolve(''); },
-      writeFile: function () { return Promise.resolve(); },
-      createFile: function () { return Promise.resolve(); },
-      deleteFile: function () { return Promise.resolve(); },
-      listFiles: function () { return Promise.resolve([]); }
-    };
-  }
-
-  function _shellExec(cmd) {
-    if (global.LibreCodigo &amp;&amp; typeof global.LibreCodigo.__exec === 'function') {
-      return global.LibreCodigo.__exec(cmd);
-    }
-    console.warn('[SDK] Shell execution not available.');
-    return Promise.resolve({ stdout: '', stderr: 'Not supported', exitCode: 1 });
-  }
-
-  /* ─── SDK Public API ────────────────────────────────────── */
-
-  const SDK = {
-    version: VERSION,
-
-    /* ── Registration ── */
-
-    registerCommand: function (id, options) {
-      _assertStr(id, 'command id');
-      if (!options || typeof options !== 'object') {
-        throw new Error('[SDK] Command options must be an object');
-      }
-      _assertStr(options.label, 'command label');
-      _assertFn(options.callback, 'command callback');
-      _commands[id] = {
-        id: id,
-        label: options.label,
-        category: options.category || 'General',
-        callback: options.callback,
-        enabled: true
-      };
-      _emit('command-registered', { id: id });
-      return _commands[id];
-    },
-
-    registerPanel: function (id, options) {
-      _assertStr(id, 'panel id');
-      if (!options || typeof options !== 'object') {
-        throw new Error('[SDK] Panel options must be an object');
-      }
-      _assertStr(options.title, 'panel title');
-      _assertFn(options.render, 'panel render');
-      _panels[id] = {
-        id: id,
-        title: options.title,
-        icon: options.icon || 'layout',
-        render: options.render
-      };
-      _emit('panel-registered', { id: id });
-      return _panels[id];
-    },
-
-    registerBlock: function (definition) {
-      if (!definition || typeof definition !== 'object') {
-        throw new Error('[SDK] Block definition must be an object');
-      }
-      _assertStr(definition.id, 'block id');
-      _assertStr(definition.label, 'block label');
-      _blocks.push(Object.assign({ category: 'general', shape: 'stack', color: '#C96B4B', ports: [] }, definition));
-      _emit('block-registered', { id: definition.id });
-    },
-
-    registerTheme: function (name, theme) {
-      _assertStr(name, 'theme name');
-      if (!theme || typeof theme !== 'object') {
-        throw new Error('[SDK] Theme must be an object');
-      }
-      _themes[name] = theme;
-      _emit('theme-registered', { name: name });
-    },
-
-    /* ── Editor ── */
-
-    getEditor: function () { return _getMonaco(); },
-
-    getLanguage: function () {
-      const m = _getMonaco();
-      if (m.getModel &amp;&amp; m.getModel()) {
-        const lang = m.getModel().getLanguageId ? m.getModel().getLanguageId() : 'unknown';
-        return lang;
-      }
-      return 'plaintext';
-    },
-
-    setLanguage: function (lang) {
-      _assertStr(lang, 'language');
-      const m = _getMonaco();
-      if (m.setModelLanguage) m.setModelLanguage(m.getModel(), lang);
-      _emit('language-change', { language: lang });
-    },
-
-    getTheme: function () {
-      const m = _getMonaco();
-      if (m.getOption) {
-        const t = m.getOption(42);
-        return t || 'vs-dark';
-      }
-      return 'vs-dark';
-    },
-
-    getActiveFile: function () {
-      if (global.LibreCodigo &amp;&amp; global.LibreCodigo.__activeFile) {
-        return global.LibreCodigo.__activeFile;
-      }
-      return null;
-    },
-
-    openFile: function (path) {
-      _assertStr(path, 'file path');
-      _emit('file-open', { path: path });
-    },
-
-    /* ── Filesystem ── */
-
-    getFilesystem: function () { return _getFs(); },
-
-    readFile: function (path) {
-      _assertStr(path, 'file path');
-      return _getFs().readFile(path);
-    },
-
-    writeFile: function (path, content) {
-      _assertStr(path, 'file path');
-      if (typeof content !== 'string') throw new Error('[SDK] content must be a string');
-      return _getFs().writeFile(path, content);
-    },
-
-    createFile: function (path) {
-      _assertStr(path, 'file path');
-      return _getFs().createFile(path);
-    },
-
-    deleteFile: function (path) {
-      _assertStr(path, 'file path');
-      return _getFs().deleteFile(path);
-    },
-
-    listFiles: function (dir) {
-      _assertStr(dir, 'directory path');
-      return _getFs().listFiles(dir);
-    },
-
-    /* ── Events ── */
-
-    onEvent: function (event, callback) {
-      _assertStr(event, 'event name');
-      _assertFn(callback, 'event callback');
-      return _on(event, callback);
-    },
-
-    emitEvent: function (event, data) {
-      _assertStr(event, 'event name');
-      _emit(event, data);
-    },
-
-    /* ── UI ── */
-
-    showNotification: function (message, type) {
-      _assertStr(message, 'notification message');
-      var validTypes = ['info', 'warning', 'error', 'success'];
-      if (type &amp;&amp; validTypes.indexOf(type) === -1) {
-        console.warn('[SDK] Invalid notification type. Using "info".');
-        type = 'info';
-      }
-      _emit('notification', { message: message, type: type || 'info' });
-      if (global.LibreCodigo &amp;&amp; typeof global.LibreCodigo.__notify === 'function') {
-        global.LibreCodigo.__notify(message, type || 'info');
-      } else {
-        console.log('[SDK:' + (type || 'info') + '] ' + message);
-      }
-    },
-
-    showInputBox: function (options) {
-      var opts = options || {};
-      if (global.LibreCodigo &amp;&amp; typeof global.LibreCodigo.__inputBox === 'function') {
-        return global.LibreCodigo.__inputBox(opts);
-      }
-      var result = prompt(opts.prompt || 'Input:', opts.default || '');
-      return Promise.resolve(result);
-    },
-
-    showQuickPick: function (items) {
-      if (!Array.isArray(items) || items.length === 0) {
-        return Promise.resolve(null);
-      }
-      if (global.LibreCodigo &amp;&amp; typeof global.LibreCodigo.__quickPick === 'function') {
-        return global.LibreCodigo.__quickPick(items);
-      }
-      var labels = items.map(function (item) {
-        return typeof item === 'string' ? item : (item.label || item);
-      });
-      var choice = prompt(
-        'Choose:\n' + labels.map(function (l, i) { return (i + 1) + '. ' + l; }).join('\n') +
-        '\n\nEnter number:'
-      );
-      var idx = parseInt(choice, 10) - 1;
-      return Promise.resolve(idx &gt;= 0 &amp;&amp; idx &lt; items.length ? labels[idx] : null);
-    },
-
-    getConfiguration: function () {
-      if (global.LibreCodigo &amp;&amp; global.LibreCodigo.__config) {
-        return Object.assign({}, global.LibreCodigo.__config);
-      }
-      return { theme: 'vs-dark', fontSize: 14, tabSize: 2 };
-    },
-
-    /* ── System ── */
-
-    executeCommand: function (cmd) {
-      _assertStr(cmd, 'command');
-      return _shellExec(cmd);
-    },
-
-    /* ── Internals ── */
-
-    _commands: _commands,
-    _panels: _panels,
-    _blocks: _blocks,
-    _themes: _themes,
-
-    getRegisteredCommands: function () {
-      return Object.keys(_commands).map(function (k) { return _commands[k]; });
-    },
-
-    getRegisteredPanels: function () {
-      return Object.keys(_panels).map(function (k) { return _panels[k]; });
-    },
-
-    getRegisteredBlocks: function () {
-      return _blocks.slice();
-    },
-
-    getRegisteredThemes: function () {
-      return Object.keys(_themes).map(function (k) { return { name: k, theme: _themes[k] }; });
-    },
-
-    unregisterCommand: function (id) {
-      if (_commands[id]) { delete _commands[id]; _emit('command-unregistered', { id: id }); }
-    },
-
-    unregisterPanel: function (id) {
-      if (_panels[id]) { delete _panels[id]; _emit('panel-unregistered', { id: id }); }
-    }
-  };
-
-  /* ─── Bootstrap ─────────────────────────────────────────── */
-
-  global.LibreCodigo = SDK;
-
-  _emit('sdk-loaded', { version: VERSION });
-
-})(typeof window !== 'undefined' ? window : typeof globalThis !== 'undefined' ? globalThis : this);</code></pre>
+    <pre style="background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:12px;overflow-x:auto;font-size:13px;line-height:1.6;max-height:500px;overflow-y:auto"><code id="sdk-code-display">Cargando...</code></pre>
   </div>
 </section>
 
@@ -1001,15 +677,51 @@ function copyCode(btn){
   });
 }
 
-/* Download SDK */
-function downloadSDK(){
-  var code=document.getElementById('sdkSourceCode').textContent;
-  var blob=new Blob([code],{type:'application/javascript'});
-  var url=URL.createObjectURL(blob);
-  var a=document.createElement('a');
-  a.href=url;a.download='libre-codigo-sdk.js';
-  document.body.appendChild(a);a.click();
-  document.body.removeChild(a);URL.revokeObjectURL(url);
+/* Load SDK source into code block */
+fetch('libre-codigo-sdk.js')
+  .then(function(r){ return r.text(); })
+  .then(function(code){
+    document.getElementById('sdk-code-display').textContent = code;
+  });
+</script>
+
+<script>
+async function downloadSDKZip() {
+  const sdkCode = await fetch('libre-codigo-sdk.js').then(r => r.text());
+  const manifest = JSON.stringify({
+    "name": "mi-plugin",
+    "displayName": "Mi Plugin",
+    "version": "1.0.0",
+    "description": "Descripción del plugin",
+    "author": "Tu Nombre",
+    "main": "index.js",
+    "permissions": ["filesystem", "terminal", "editor"],
+    "minAppVersion": "0.1.0",
+    "contributes": { "commands": [], "panels": [], "blocks": [] }
+  }, null, 2);
+  const readme = "# Mi Plugin para Libre Código\n\n## Uso\n\n```html\n<script src=\"libre-codigo-sdk.js\"><\/script>\n<script>\n  LibreCodigo.init({ pluginId: 'mi-plugin' });\n  LibreCodigo.registerCommand('saludar', {\n    label: 'Saludar',\n    callback: () => LibreCodigo.showNotification('¡Hola!')\n  });\n<\/script>\n```\n\n## Desarrollo\n\nConsulta la documentación completa en:\nhttps://librecodigo.github.io/LibreCodigo/sdk/\n";
+
+  const files = {
+    'libre-codigo-sdk.js': sdkCode,
+    'manifest.json': manifest,
+    'index.js': '// Punto de entrada del plugin\nLibreCodigo.init({ pluginId: "mi-plugin", manifest: require("./manifest.json") });\n\n// Tus comandos aquí\n',
+    'README.md': readme
+  };
+
+  // Simple text-based zip (store only, no compression)
+  // For real use, the user would use JSZip or similar
+  let content = '=== Paquete SDK de Libre Código ===\n\n';
+  Object.keys(files).forEach(name => {
+    content += '--- ' + name + ' ---\n' + files[name] + '\n\n';
+  });
+
+  const blob = new Blob([content], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'libre-codigo-sdk-package.txt';
+  a.click();
+  URL.revokeObjectURL(url);
 }
 </script>
 </body>
