@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Libre Código — IDE Visual</title>
+  <title>Libre Codigo - IDE Visual</title>
   <link rel="icon" href="../logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/css/xterm.min.css" rel="stylesheet">
@@ -16,232 +16,205 @@
       --accent:#C96B4B;--accent2:#D97B2E;--accent3:#874418;
       --amber:#F0B429;--sand:#F0E6D8;--cream:#FFFCF5;
       --success:#059669;--warning:#D97B2E;--error:#DC2626;
-      --sidebar-w:260px;--activity-w:48px;--statusbar-h:24px;--titlebar-h:36px;
-      --bottom-h:200px;--font:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
+      --font:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
     }
     html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--text)}
-    ::-webkit-scrollbar{width:8px;height:8px}
+    ::-webkit-scrollbar{width:6px;height:6px}
     ::-webkit-scrollbar-track{background:transparent}
-    ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+    ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
     ::-webkit-scrollbar-thumb:hover{background:var(--border2)}
 
-    /* ── Layout ── */
     .app{display:flex;flex-direction:column;height:100vh}
-    .titlebar{height:var(--titlebar-h);background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 12px;gap:10px;user-select:none;-webkit-app-region:drag;flex-shrink:0}
-    .titlebar img{width:20px;height:20px}
+
+    /* Titlebar */
+    .titlebar{height:34px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 12px;gap:10px;user-select:none;flex-shrink:0}
+    .titlebar img{width:18px;height:18px}
     .titlebar-title{font-size:12px;font-weight:600;color:var(--text)}
-    .titlebar-actions{margin-left:auto;display:flex;gap:8px;-webkit-app-region:no-drag}
-    .titlebar-actions button{width:28px;height:28px;border:none;background:transparent;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2)}
+    .titlebar-actions{margin-left:auto;display:flex;gap:4px}
+    .titlebar-actions button{width:28px;height:28px;border:none;background:transparent;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:14px}
     .titlebar-actions button:hover{background:var(--bg3)}
-    .main{display:flex;flex:1;overflow:hidden}
-    .activity-bar{width:var(--activity-w);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:4px;flex-shrink:0}
-    .activity-btn{width:40px;height:40px;border:none;background:transparent;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);transition:all .15s}
+
+    /* Main area */
+    .main{display:flex;flex:1;overflow:hidden;min-height:0}
+
+    /* Activity bar */
+    .activity-bar{width:44px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:6px 0;gap:2px;flex-shrink:0}
+    .activity-btn{width:38px;height:38px;border:none;background:transparent;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);transition:all .15s;font-size:16px}
     .activity-btn:hover{background:var(--bg3);color:var(--text)}
     .activity-btn.active{background:var(--accent);color:#fff}
-    .sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;transition:width .2s}
+
+    /* Sidebar */
+    .sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;transition:width .15s}
     .sidebar.collapsed{width:0;border:none}
-    .sidebar-header{padding:12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-    .sidebar-header h3{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2)}
-    .sidebar-actions{display:flex;gap:4px}
-    .sidebar-actions button{width:24px;height:24px;border:none;background:transparent;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:14px}
+    .sidebar-header{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .sidebar-header h3{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2)}
+    .sidebar-actions{display:flex;gap:2px}
+    .sidebar-actions button{width:22px;height:22px;border:none;background:transparent;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:14px}
     .sidebar-actions button:hover{background:var(--bg3)}
-    .sidebar-content{flex:1;overflow-y:auto;padding:8px 0}
-    .editor-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
-    .tabs-bar{height:36px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:end;overflow-x:auto;flex-shrink:0}
-    .tab{height:32px;padding:0 16px;border:1px solid transparent;border-bottom:none;border-radius:8px 8px 0 0;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);white-space:nowrap;margin:0 1px;transition:all .15s}
+    .sidebar-content{flex:1;overflow-y:auto;padding:4px 0}
+
+    /* Editor area */
+    .editor-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+    .tabs-bar{height:34px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:flex-end;overflow-x:auto;flex-shrink:0;padding:0 4px}
+    .tab{height:30px;padding:0 14px;border:1px solid transparent;border-bottom:none;border-radius:6px 6px 0 0;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);white-space:nowrap;margin:0 1px;transition:all .1s}
     .tab:hover{background:var(--bg3)}
     .tab.active{background:var(--surface);color:var(--text);border-color:var(--border);font-weight:500}
-    .tab .modified{width:6px;height:6px;border-radius:50%;background:var(--accent)}
-    .tab .close{width:16px;height:16px;border:none;background:transparent;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px;opacity:0}
+    .tab .modified{width:5px;height:5px;border-radius:50%;background:var(--accent)}
+    .tab .close{width:14px;height:14px;border:none;background:transparent;border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:11px;opacity:0}
     .tab:hover .close{opacity:1}
-    .editor-container{flex:1;overflow:hidden;position:relative}
-    .bottom-panel{height:var(--bottom-h);border-top:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:height .2s}
-    .bottom-panel.collapsed{height:0;border:none}
-    .bottom-tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 8px}
-    .bottom-tab{padding:8px 16px;font-size:12px;border:none;background:transparent;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;font-weight:500}
-    .bottom-tab:hover{color:var(--text)}
-    .bottom-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-    .bottom-content{flex:1;overflow:auto;padding:8px 12px;font-family:var(--mono);font-size:13px}
-    .statusbar{height:var(--statusbar-h);background:var(--accent);color:#fff;display:flex;align-items:center;padding:0 12px;font-size:11px;gap:16px;flex-shrink:0}
-    .statusbar span{opacity:.9}
-    .statusbar .right{margin-left:auto;display:flex;gap:16px}
 
-    /* ── File tree ── */
-    .file-tree-item{display:flex;align-items:center;gap:6px;padding:4px 8px 4px 16px;cursor:pointer;font-size:13px;color:var(--text);transition:background .1s}
-    .file-tree-item:hover{background:var(--bg3)}
-    .file-tree-item.active{background:var(--accent);color:#fff;border-radius:4px;margin:0 4px}
-    .file-tree-item .icon{width:16px;height:16px;flex-shrink:0}
-    .file-tree-item.dir{font-weight:500}
-    .indent{display:inline-block}
-    .file-icon{color:var(--amber)}
-    .folder-icon{color:var(--accent2)}
-    .js-icon{color:#F0B429}
-    .py-icon{color:#3B82F6}
-    .bat-icon{color:#9CA3AF}
-    .css-icon{color:#8B5CF6}
-    .html-icon{color:#EF4444}
-    .json-icon{color:#059669}
-    .md-icon{color:#6B7280}
+    /* Editor content area — flex container */
+    .editor-content{flex:1;display:flex;overflow:hidden;position:relative;min-height:0}
 
-    /* ── Block editor ── */
-    .block-canvas{flex:1;background:var(--bg2);background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:20px 20px;position:relative;overflow:auto;padding:20px}
-    .block-palette{width:220px;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:8px}
-    .block-cat{padding:6px 10px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-top:8px}
-    .block-item{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;cursor:grab;font-size:12px;transition:background .1s}
-    .block-item:hover{background:var(--bg3)}
-    .block-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
-
-    /* ── Welcome ── */
-    .welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:16px;color:var(--text2)}
-    .welcome img{width:80px;height:80px}
-    .welcome h2{font-size:20px;color:var(--text);font-weight:600}
-    .welcome p{font-size:14px;max-width:400px;text-align:center;line-height:1.6}
-    .welcome-actions{display:flex;gap:12px;margin-top:8px}
-    .welcome-actions button{padding:10px 20px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;transition:all .15s}
+    /* Welcome */
+    .welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;gap:12px;color:var(--text2)}
+    .welcome img{width:64px;height:64px}
+    .welcome h2{font-size:18px;color:var(--text);font-weight:600}
+    .welcome p{font-size:13px;max-width:360px;text-align:center;line-height:1.6}
+    .welcome-actions{display:flex;gap:10px;margin-top:6px}
+    .welcome-actions button{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;font-weight:500;display:flex;align-items:center;gap:6px;transition:all .15s}
     .welcome-actions button:hover{border-color:var(--accent);color:var(--accent)}
     .welcome-actions button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
     .welcome-actions button.primary:hover{background:var(--accent3)}
 
-    /* ── Community ── */
-    .community-panel{padding:12px}
-    .community-panel h4{font-size:13px;font-weight:600;margin-bottom:10px;color:var(--text)}
-    .plugin-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:8px;cursor:pointer;transition:all .15s}
-    .plugin-card:hover{border-color:var(--accent);box-shadow:0 2px 8px rgba(0,0,0,.06)}
-    .plugin-card .name{font-size:13px;font-weight:600;color:var(--text)}
-    .plugin-card .author{font-size:11px;color:var(--text3)}
-    .plugin-card .desc{font-size:12px;color:var(--text2);margin-top:4px}
-    .plugin-card .meta{display:flex;gap:12px;margin-top:6px;font-size:11px;color:var(--text3)}
-    .plugin-card .rating{color:var(--amber)}
-    .upload-zone{border:2px dashed var(--border);border-radius:8px;padding:20px;text-align:center;cursor:pointer;margin-bottom:12px;transition:all .15s}
-    .upload-zone:hover{border-color:var(--accent);background:var(--bg2)}
-    .upload-zone p{font-size:12px;color:var(--text3)}
+    /* Split divider */
+    .split-divider{width:3px;background:var(--border);cursor:ew-resize;flex-shrink:0;transition:background .1s}
+    .split-divider:hover{background:var(--accent)}
 
-    /* ── Search ── */
-    .search-panel{padding:12px}
-    .search-input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--bg);color:var(--text);font-family:var(--font)}
+    /* Bottom panel */
+    .bottom-panel{height:180px;border-top:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:height .15s}
+    .bottom-panel.collapsed{height:0;border:none;overflow:hidden}
+    .bottom-tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 8px}
+    .bottom-tab{padding:6px 14px;font-size:11px;border:none;background:transparent;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;font-weight:500}
+    .bottom-tab:hover{color:var(--text)}
+    .bottom-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+    .bottom-content{flex:1;overflow:auto;padding:4px 8px;font-family:var(--mono);font-size:12px;min-height:0}
+
+    /* Statusbar */
+    .statusbar{height:22px;background:var(--accent);color:#fff;display:flex;align-items:center;padding:0 10px;font-size:10px;gap:12px;flex-shrink:0}
+    .statusbar span{opacity:.9}
+    .statusbar .right{margin-left:auto;display:flex;gap:12px}
+    .view-modes{display:flex;gap:3px}
+    .view-mode-btn{padding:2px 8px;border:1px solid rgba(255,255,255,.3);background:transparent;border-radius:4px;font-size:10px;cursor:pointer;color:#fff;font-family:var(--font)}
+    .view-mode-btn.active{background:rgba(255,255,255,.2)}
+
+    /* File tree */
+    .file-tree-item{display:flex;align-items:center;gap:6px;padding:3px 8px;cursor:pointer;font-size:12px;color:var(--text);transition:background .1s}
+    .file-tree-item:hover{background:var(--bg3)}
+    .file-tree-item.active{background:var(--accent);color:#fff;border-radius:4px;margin:0 4px;padding:3px 4px}
+
+    /* Block editor */
+    .block-editor{display:flex;width:100%;height:100%;overflow:hidden}
+    .block-palette{width:200px;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;padding:4px 0}
+    .block-cat{padding:4px 10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-top:6px}
+    .block-item{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:5px;cursor:grab;font-size:11px;transition:background .1s}
+    .block-item:hover{background:var(--bg3)}
+    .block-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+    .block-canvas{flex:1;background:var(--bg);background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:16px 16px;overflow:auto;padding:16px;position:relative}
+    .block-node{position:absolute;border-radius:10px;padding:10px 16px;color:#fff;font-size:12px;font-weight:600;cursor:grab;min-width:140px;text-align:center;box-shadow:0 3px 12px rgba(0,0,0,.15);transition:box-shadow .15s;user-select:none}
+    .block-node:hover{box-shadow:0 6px 20px rgba(0,0,0,.25)}
+    .block-node.selected{outline:2px solid var(--text);outline-offset:2px}
+    .block-node .delete-btn{position:absolute;top:-6px;right:-6px;width:16px;height:16px;border-radius:50%;background:var(--error);color:#fff;border:none;font-size:10px;cursor:pointer;display:none;align-items:center;justify-content:center;line-height:1}
+    .block-node:hover .delete-btn{display:flex}
+    .block-edge{position:absolute;pointer-events:none}
+
+    /* Community / plugins */
+    .panel-content{padding:8px 10px}
+    .panel-content h4{font-size:12px;font-weight:600;margin-bottom:8px}
+    .plugin-card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;margin-bottom:6px;cursor:pointer;transition:all .15s}
+    .plugin-card:hover{border-color:var(--accent);box-shadow:0 2px 6px rgba(0,0,0,.06)}
+    .plugin-card .name{font-size:12px;font-weight:600}
+    .plugin-card .author{font-size:10px;color:var(--text3)}
+    .plugin-card .desc{font-size:11px;color:var(--text2);margin-top:3px}
+    .plugin-card .meta{display:flex;gap:10px;margin-top:4px;font-size:10px;color:var(--text3)}
+
+    /* Settings */
+    .settings-group{margin-bottom:12px}
+    .settings-group label{font-size:11px;font-weight:500;color:var(--text2);display:block;margin-bottom:3px}
+    .settings-group select,.settings-group input[type=range]{width:100%;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:12px;background:var(--bg);color:var(--text)}
+
+    /* Search */
+    .search-input{width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:5px;font-size:12px;background:var(--bg);color:var(--text);font-family:var(--font)}
     .search-input:focus{outline:none;border-color:var(--accent)}
-    .search-results{margin-top:8px}
-    .search-result{padding:6px 8px;font-size:12px;border-radius:4px;cursor:pointer;font-family:var(--mono)}
+    .search-result{padding:4px 6px;font-size:11px;border-radius:3px;cursor:pointer;font-family:var(--mono)}
     .search-result:hover{background:var(--bg3)}
-    .search-result .file{color:var(--accent);font-weight:500}
-    .search-result .line{color:var(--text3);margin-left:8px}
 
-    /* ── Settings ── */
-    .settings-panel{padding:12px}
-    .settings-group{margin-bottom:16px}
-    .settings-group label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bottom:4px}
-    .settings-group select,.settings-group input[type=range]{width:100%;padding:6px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--bg);color:var(--text)}
-
-    /* ── Notifications ── */
-    .notifications{position:fixed;top:50px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px}
-    .notification{padding:10px 16px;border-radius:8px;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,.1);animation:slideIn .3s;min-width:200px;display:flex;align-items:center;gap:8px}
+    /* Notifications */
+    .notifications{position:fixed;top:44px;right:12px;z-index:9999;display:flex;flex-direction:column;gap:6px}
+    .notification{padding:8px 14px;border-radius:6px;font-size:12px;box-shadow:0 3px 10px rgba(0,0,0,.1);animation:slideIn .2s;min-width:180px}
     .notification.info{background:#EFF6FF;border:1px solid #BFDBFE;color:#1E40AF}
     .notification.success{background:#ECFDF5;border:1px solid #A7F3D0;color:#065F46}
     .notification.error{background:#FEF2F2;border:1px solid #FECACA;color:#991B1B}
     @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
 
-    /* ── Context Menu ── */
-    .context-menu{position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:10000;padding:4px;min-width:180px}
-    .context-menu-item{padding:6px 12px;font-size:12px;border-radius:4px;cursor:pointer;display:flex;align-items:center;gap:8px}
+    /* Context menu */
+    .context-menu{position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.12);z-index:10000;padding:3px;min-width:160px}
+    .context-menu-item{padding:5px 10px;font-size:11px;border-radius:3px;cursor:pointer;display:flex;align-items:center;gap:6px}
     .context-menu-item:hover{background:var(--bg3)}
     .context-menu-item.danger{color:var(--error)}
-    .context-menu-divider{height:1px;background:var(--border);margin:4px 0}
-
-    /* ── Resize handles ── */
-    .resize-handle{position:absolute;z-index:10}
-    .resize-h{height:4px;cursor:ns-resize}
-    .resize-v{width:4px;cursor:ew-resize}
-    .resize-handle:hover{background:var(--accent);opacity:.3}
-
-    /* ── Split view ── */
-    .split-container{display:flex;flex:1;overflow:hidden}
-    .split-pane{flex:1;overflow:hidden;display:flex;flex-direction:column}
-    .split-divider{width:4px;background:var(--border);cursor:ew-resize;flex-shrink:0}
-    .split-divider:hover{background:var(--accent)}
-
-    /* ── View mode buttons ── */
-    .view-modes{display:flex;gap:4px;padding:0 8px}
-    .view-mode-btn{padding:4px 10px;border:1px solid var(--border);background:var(--surface);border-radius:6px;font-size:11px;cursor:pointer;color:var(--text2)}
-    .view-mode-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-
-    /* ── Toast ── */
-    .toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:8px 20px;border-radius:8px;font-size:13px;z-index:9999;animation:fadeUp .3s}
-    @keyframes fadeUp{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+    .context-menu-divider{height:1px;background:var(--border);margin:3px 0}
   </style>
 </head>
 <body>
-  <div class="app" id="app">
-    <!-- Titlebar -->
+  <div class="app">
     <div class="titlebar">
       <img src="../logo.png" alt="LC">
-      <span class="titlebar-title" id="projectTitle">Libre Código — IDE Web</span>
+      <span class="titlebar-title" id="projectTitle">Libre Codigo - IDE Web</span>
       <div class="titlebar-actions">
-        <button onclick="toggleSidebar()" title="Sidebar (Ctrl+B)">☰</button>
-        <button onclick="toggleBottomPanel()" title="Terminal (Ctrl+`)">▀</button>
+        <button onclick="toggleSidebar()" title="Sidebar (Ctrl+B)">&#9776;</button>
+        <button onclick="toggleBottomPanel()" title="Terminal (Ctrl+`)">&#9650;</button>
       </div>
     </div>
-
     <div class="main">
-      <!-- Activity Bar -->
       <div class="activity-bar">
-        <button class="activity-btn active" data-panel="explorer" onclick="switchPanel('explorer')" title="Explorador">📁</button>
-        <button class="activity-btn" data-panel="blocks" onclick="switchPanel('blocks')" title="Bloques">🧩</button>
-        <button class="activity-btn" data-panel="search" onclick="switchPanel('search')" title="Buscar">🔍</button>
-        <button class="activity-btn" data-panel="community" onclick="switchPanel('community')" title="Comunidad">👥</button>
-        <button class="activity-btn" data-panel="extensions" onclick="switchPanel('extensions')" title="Plugins">🔌</button>
-        <button class="activity-btn" data-panel="settings" onclick="switchPanel('settings')" title="Configuración">⚙️</button>
+        <button class="activity-btn active" data-panel="explorer" onclick="switchPanel('explorer')" title="Explorador">&#128193;</button>
+        <button class="activity-btn" data-panel="blocks" onclick="switchPanel('blocks')" title="Bloques">&#129513;</button>
+        <button class="activity-btn" data-panel="search" onclick="switchPanel('search')" title="Buscar">&#128269;</button>
+        <button class="activity-btn" data-panel="community" onclick="switchPanel('community')" title="Comunidad">&#128101;</button>
+        <button class="activity-btn" data-panel="extensions" onclick="switchPanel('extensions')" title="Plugins">&#128268;</button>
+        <button class="activity-btn" data-panel="settings" onclick="switchPanel('settings')" title="Configuracion">&#9881;</button>
       </div>
-
-      <!-- Sidebar -->
       <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
           <h3 id="sidebarTitle">Explorador</h3>
           <div class="sidebar-actions" id="sidebarActions">
             <button onclick="newFile()" title="Nuevo archivo">+</button>
-            <button onclick="newFolder()" title="Nueva carpeta">📁</button>
           </div>
         </div>
         <div class="sidebar-content" id="sidebarContent"></div>
       </div>
-
-      <!-- Editor Area -->
       <div class="editor-area">
         <div class="tabs-bar" id="tabsBar"></div>
-        <div class="editor-container" id="editorContainer">
+        <div class="editor-content" id="editorContent">
           <div class="welcome" id="welcomeScreen">
-            <img src="../logo.png" alt="Libre Código">
-            <h2>Bienvenido a Libre Código</h2>
-            <p>IDE visual con programación de bloques y código real. Crea un proyecto o abre un archivo para comenzar.</p>
+            <img src="../logo.png" alt="Libre Codigo">
+            <h2>Bienvenido a Libre Codigo</h2>
+            <p>IDE visual con bloques y codigo real. Crea un proyecto o abre un archivo.</p>
             <div class="welcome-actions">
-              <button class="primary" onclick="newProject()">📄 Nuevo Proyecto</button>
-              <button onclick="newFile()">📁 Nuevo Archivo</button>
+              <button class="primary" onclick="newProject()">Nuevo Proyecto</button>
+              <button onclick="newFile()">Nuevo Archivo</button>
             </div>
           </div>
-          <div id="monacoContainer" style="width:100%;height:100%;display:none"></div>
-          <div id="blockEditorContainer" style="width:100%;height:100%;display:none"></div>
+          <div id="monacoContainer" style="flex:1;display:none;min-width:0"></div>
+          <div id="splitDivider" class="split-divider" style="display:none"></div>
+          <div id="blockEditorContainer" style="flex:1;display:none;min-width:0"></div>
         </div>
       </div>
     </div>
-
-    <!-- Bottom Panel -->
     <div class="bottom-panel" id="bottomPanel">
       <div class="bottom-tabs">
         <button class="bottom-tab active" data-btab="terminal" onclick="switchBottomTab('terminal')">Terminal</button>
         <button class="bottom-tab" data-btab="output" onclick="switchBottomTab('output')">Salida</button>
-        <button class="bottom-tab" data-btab="problems" onclick="switchBottomTab('problems')">Problemas</button>
       </div>
       <div class="bottom-content" id="terminalContainer"></div>
       <div class="bottom-content" id="outputContainer" style="display:none"></div>
-      <div class="bottom-content" id="problemsContainer" style="display:none"></div>
     </div>
-
-    <!-- Statusbar -->
     <div class="statusbar">
       <span id="statusLanguage">JavaScript</span>
       <span id="statusFile">Sin archivo</span>
       <div class="right">
         <div class="view-modes">
-          <button class="view-mode-btn active" onclick="setViewMode('code')">Código</button>
+          <button class="view-mode-btn active" onclick="setViewMode('code')">Codigo</button>
           <button class="view-mode-btn" onclick="setViewMode('blocks')">Bloques</button>
           <button class="view-mode-btn" onclick="setViewMode('split')">Dividir</button>
         </div>
@@ -250,25 +223,17 @@
       </div>
     </div>
   </div>
-
   <div class="notifications" id="notifications"></div>
 
-  <!-- Libs -->
   <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/lib/xterm.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@0.10.0/lib/addon-fit.min.js"></script>
   <script src="engine.js"></script>
 
   <script>
-  // ══════════════════════════════════════════════════════════════════
-  // Libre Código Web IDE — 1:1 with Desktop
-  // Uses REAL compiled engine (parsers, emitter, IR, blocks)
-  // ══════════════════════════════════════════════════════════════════
-
-  const E = LibreCodigoEngine;
+  const E = window.LibreCodigoEngine || {};
   const API_BASE = window.location.origin;
 
-  // ── State ──────────────────────────────────────────────────────────
   let state = {
     files: {},
     openFiles: [],
@@ -280,116 +245,118 @@
     sidebarOpen: true,
     bottomOpen: true,
     modified: new Set(),
-    cursorLine: 1,
-    cursorCol: 1,
     blockNodes: [],
     blockEdges: [],
+    dragBlock: null,
+    dragOffset: { x: 0, y: 0 },
+    blockUndoStack: [],
+    blockRedoStack: [],
   };
 
-  // ── Virtual Filesystem ─────────────────────────────────────────────
   const DEFAULT_FILES = {
-    'mi-proyecto/': null,
-    'mi-proyecto/main.js': 'function main() {\n    console.log("¡Hola desde Libre Código!");\n    \n    for (let i = 0; i < 5; i++) {\n        console.log("Iteración: " + i);\n    }\n    \n    const resultado = sumar(10, 20);\n    console.log("Resultado: " + resultado);\n}\n\nfunction sumar(a, b) {\n    return a + b;\n}\n\nmain();\n',
+    'mi-proyecto/main.js': 'function main() {\n    console.log("Hola desde Libre Codigo!");\n    for (let i = 0; i < 5; i++) {\n        console.log("Iteracion: " + i);\n    }\n    const resultado = sumar(10, 20);\n    console.log("Resultado: " + resultado);\n}\n\nfunction sumar(a, b) {\n    return a + b;\n}\n\nmain();\n',
     'mi-proyecto/utils.js': '// Funciones de utilidad\nexport function formatDate(date) {\n    return date.toLocaleDateString("es-ES");\n}\n\nexport function capitalize(str) {\n    return str.charAt(0).toUpperCase() + str.slice(1);\n}\n',
-    'mi-proyecto/app.py': '# Programa principal\nimport sys\n\ndef main():\n    print("¡Hola desde Libre Código en Python!")\n    \n    numeros = [1, 2, 3, 4, 5]\n    for n in numeros:\n        print(f"Número: {n}")\n    \n    resultado = sumar(10, 20)\n    print(f"Resultado: {resultado}")\n\ndef sumar(a, b):\n    return a + b\n\nif __name__ == "__main__":\n    main()\n',
-    'mi-proyecto/hello.bat': '@echo off\nREM Programa en Batch\necho ¡Hola desde Libre Código en Batch!\n\nset /a count=0\n:loop\nif %count% GEQ 5 goto done\necho Iteración: %count%\nset /a count=%count%+1\ngoto loop\n:done\necho Completado!\npause\n',
-    'mi-proyecto/styles.css': 'body {\n    font-family: "Inter", sans-serif;\n    margin: 0;\n    padding: 0;\n    background: #FFFCF5;\n    color: #1F2937;\n}\n\n.container {\n    max-width: 1200px;\n    margin: 0 auto;\n    padding: 20px;\n}\n',
-    'mi-proyecto/index.html': '<!DOCTYPE html>\n<html lang="es">\n<head>\n    <meta charset="UTF-8">\n    <title>Mi Proyecto</title>\n    <link rel="stylesheet" href="styles.css">\n</head>\n<body>\n    <div class="container">\n        <h1>Mi Proyecto</h1>\n        <p>Generado con Libre Código</p>\n    </div>\n</body>\n</html>\n',
-    'mi-proyecto/package.json': '{\n    "name": "mi-proyecto",\n    "version": "1.0.0",\n    "description": "Proyecto creado con Libre Código",\n    "main": "main.js",\n    "scripts": {\n        "start": "node main.js"\n    }\n}\n',
+    'mi-proyecto/app.py': '# Programa principal\nimport sys\n\ndef main():\n    print("Hola desde Libre Codigo en Python!")\n    numeros = [1, 2, 3, 4, 5]\n    for n in numeros:\n        print(f"Numero: {n}")\n    resultado = sumar(10, 20)\n    print(f"Resultado: {resultado}")\n\ndef sumar(a, b):\n    return a + b\n\nif __name__ == "__main__":\n    main()\n',
+    'mi-proyecto/hello.bat': '@echo off\nREM Programa en Batch\necho Hola desde Libre Codigo en Batch!\nset /a count=0\n:loop\nif %count% GEQ 5 goto done\necho Iteracion: %count%\nset /a count=%count%+1\ngoto loop\n:done\necho Completado!\npause\n',
+    'mi-proyecto/styles.css': 'body {\n    font-family: "Inter", sans-serif;\n    margin: 0;\n    padding: 0;\n    background: #FFFCF5;\n    color: #1F2937;\n}\n',
+    'mi-proyecto/index.html': '<!DOCTYPE html>\n<html lang="es">\n<head>\n    <meta charset="UTF-8">\n    <title>Mi Proyecto</title>\n    <link rel="stylesheet" href="styles.css">\n</head>\n<body>\n    <h1>Mi Proyecto</h1>\n    <p>Generado con Libre Codigo</p>\n</body>\n</html>',
+    'mi-proyecto/package.json': '{\n    "name": "mi-proyecto",\n    "version": "1.0.0"\n}\n',
   };
 
   function initFileSystem() {
-    Object.keys(DEFAULT_FILES).forEach(path => {
-      if (DEFAULT_FILES[path] !== null) {
-        state.files[path] = DEFAULT_FILES[path];
-      }
+    const saved = localStorage.getItem('lc_web_state');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        Object.assign(state.files, parsed.files || {});
+        state.openFiles = parsed.openFiles || [];
+        state.activeFile = parsed.activeFile || null;
+        state.language = parsed.language || 'javascript';
+        state.viewMode = parsed.viewMode || 'code';
+        state.sidebarPanel = parsed.sidebarPanel || 'explorer';
+        state.sidebarOpen = parsed.sidebarOpen !== undefined ? parsed.sidebarOpen : true;
+        state.bottomOpen = parsed.bottomOpen !== undefined ? parsed.bottomOpen : true;
+        return;
+      } catch(e) {}
+    }
+    Object.entries(DEFAULT_FILES).forEach(([path, content]) => {
+      if (content !== null) state.files[path] = content;
     });
   }
 
-  function getFileName(path) {
-    return path.split('/').filter(Boolean).pop();
+  function saveState() {
+    const toSave = {
+      files: state.files,
+      openFiles: state.openFiles,
+      activeFile: state.activeFile,
+      language: state.language,
+      viewMode: state.viewMode,
+      sidebarPanel: state.sidebarPanel,
+      sidebarOpen: state.sidebarOpen,
+      bottomOpen: state.bottomOpen,
+    };
+    try { localStorage.setItem('lc_web_state', JSON.stringify(toSave)); } catch(e) {}
   }
-
-  function getFileLanguage(path) {
-    const ext = path.split('.').pop().toLowerCase();
-    const map = { js: 'javascript', py: 'python', bat: 'batch', css: 'css', html: 'html', json: 'json', md: 'markdown' };
-    return map[ext] || 'plaintext';
+  function getFileName(p) { return p.split('/').filter(Boolean).pop(); }
+  function getFileLanguage(p) {
+    const ext = p.split('.').pop().toLowerCase();
+    return { js:'javascript', py:'python', bat:'batch', css:'css', html:'html', json:'json' }[ext] || 'plaintext';
   }
-
-  function getFileIcon(path) {
-    const ext = path.split('.').pop().toLowerCase();
-    const map = { js: '📜', py: '🐍', bat: '💻', css: '🎨', html: '🌐', json: '{ }', md: '📝', txt: '📄' };
-    return map[ext] || '📄';
-  }
-
-  function isDir(path) {
-    return path.endsWith('/') && !(path in state.files);
+  function getFileIcon(p) {
+    const ext = p.split('.').pop().toLowerCase();
+    return { js:'&#128196;', py:'&#128013;', bat:'&#128187;', css:'&#127912;', html:'&#127760;', json:'{ }', txt:'&#128196;' }[ext] || '&#128196;';
   }
 
   function getDirChildren(dirPath) {
     const children = new Set();
     Object.keys(state.files).forEach(path => {
       if (path.startsWith(dirPath) && path !== dirPath) {
-        const rest = path.slice(dirPath.length);
-        const first = rest.split('/')[0];
-        children.add(first);
+        children.add(path.slice(dirPath.length).split('/')[0]);
       }
     });
     return Array.from(children).sort();
   }
 
-  // ── File Tree Rendering ────────────────────────────────────────────
+  // ── File Tree ──
   function renderFileTree() {
     const container = document.getElementById('sidebarContent');
     if (state.sidebarPanel !== 'explorer') return;
-
     const dirs = new Set();
     const files = new Set();
     Object.keys(state.files).forEach(path => {
       const parts = path.split('/').filter(Boolean);
-      for (let i = 1; i < parts.length; i++) {
-        dirs.add(parts.slice(0, i).join('/') + '/');
-      }
+      for (let i = 1; i < parts.length; i++) dirs.add(parts.slice(0, i).join('/') + '/');
       if (!path.endsWith('/')) files.add(path);
     });
-
     let html = '';
     function renderNode(depth, prefix) {
       const children = [];
       dirs.forEach(d => {
-        if (d.startsWith(prefix) && d.split('/').filter(Boolean).length === depth + 1) {
+        if (d.startsWith(prefix) && d.split('/').filter(Boolean).length === depth + 1)
           children.push({ path: d, type: 'dir' });
-        }
       });
       files.forEach(f => {
-        if (f.startsWith(prefix) && f.split('/').filter(Boolean).length === depth) {
+        if (f.startsWith(prefix) && !f.endsWith('/') && f.split('/').filter(Boolean).length === depth)
           children.push({ path: f, type: 'file' });
-        }
       });
       children.sort((a, b) => a.path.localeCompare(b.path));
-
       children.forEach(child => {
         const name = getFileName(child.path);
-        const indent = depth * 16;
+        const indent = depth * 14;
         const active = state.activeFile === child.path ? ' active' : '';
-        const icon = child.type === 'dir' ? '📁' : getFileIcon(child.path);
-        const cls = child.type === 'dir' ? 'dir' : '';
-        html += `<div class="file-tree-item${active}" style="padding-left:${12 + indent}px" onclick="${child.type === 'file' ? `openFile('${child.path}')` : `toggleDir('${child.path}')`}" oncontextmenu="showFileContextMenu(event, '${child.path}')">`;
-        html += `<span class="icon">${icon}</span>`;
-        html += `<span class="${cls}">${name}</span>`;
-        html += '</div>';
-        if (child.type === 'dir') {
-          renderNode(depth + 1, child.path);
-        }
+        const icon = child.type === 'dir' ? '&#128193;' : getFileIcon(child.path);
+        html += '<div class="file-tree-item' + active + '" style="padding-left:' + (10 + indent) + 'px" onclick="' + (child.type === 'file' ? "openFile('" + child.path + "')" : "void(0)") + '" oncontextmenu="showFileContextMenu(event,\'' + child.path + '\')">';
+        html += '<span style="font-size:13px">' + icon + '</span>';
+        html += '<span>' + name + '</span></div>';
       });
     }
     renderNode(0, '');
-    container.innerHTML = html;
+    container.innerHTML = html || '<div style="padding:12px;color:var(--text3);font-size:11px">Sin archivos</div>';
   }
 
-  // ── Monaco Editor ──────────────────────────────────────────────────
+  // ── Monaco ──
   let editor = null;
-  const WARM_FUTURE = {
+  const WARM_THEME = {
     base: 'vs', inherit: true,
     rules: [
       { token: 'keyword', foreground: 'C96B4B', fontStyle: 'bold' },
@@ -398,39 +365,28 @@
       { token: 'number', foreground: 'D97B2E' },
       { token: 'type', foreground: '059669' },
       { token: 'function', foreground: 'C96B4B' },
-      { token: 'variable', foreground: '1F2937' },
-      { token: 'operator', foreground: '874418' },
     ],
     colors: {
       'editor.background': '#FFFCF5', 'editor.foreground': '#1F2937',
       'editorCursor.foreground': '#C96B4B', 'editor.lineHighlightBackground': '#FAF3E6',
       'editor.selectionBackground': '#C96B4B33', 'editorLineNumber.foreground': '#D4C5B5',
       'editorLineNumber.activeForeground': '#C96B4B', 'editorIndentGuide.background': '#F0E6D8',
-      'editorWidget.background': '#FFFFFF', 'editorSuggestWidget.background': '#FFFFFF',
-      'editorSuggestWidget.border': '#E8DDD0', 'editorSuggestWidget.selectedBackground': '#FAF3E6',
-      'input.background': '#FAF3E6', 'input.border': '#E8DDD0', 'input.foreground': '#1F2937',
-      'scrollbarSlider.background': '#D4C5B580', 'scrollbarSlider.hoverBackground': '#D4C5B5',
-      'scrollbarSlider.activeBackground': '#C96B4B',
     }
   };
 
   require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' } });
   require(['vs/editor/editor.main'], function () {
-    monaco.editor.defineTheme('warm-future', WARM_FUTURE);
+    monaco.editor.defineTheme('warm-future', WARM_THEME);
     editor = monaco.editor.create(document.getElementById('monacoContainer'), {
       value: '', language: 'javascript', theme: 'warm-future',
-      fontFamily: "'JetBrains Mono', monospace", fontSize: 14,
-      minimap: { enabled: true }, padding: { top: 12 },
+      fontFamily: "'JetBrains Mono', monospace", fontSize: 13,
+      minimap: { enabled: true }, padding: { top: 8 },
       bracketPairColorization: { enabled: true },
       smoothScrolling: true, cursorBlinking: 'smooth',
-      tabSize: 4, wordWrap: 'off',
-      renderWhitespace: 'selection',
-      scrollBeyondLastLine: false,
+      tabSize: 4, scrollBeyondLastLine: false,
     });
     editor.onDidChangeCursorPosition(e => {
-      state.cursorLine = e.position.lineNumber;
-      state.cursorCol = e.position.column;
-      document.getElementById('statusCursor').textContent = `Ln ${e.position.lineNumber}, Col ${e.position.column}`;
+      document.getElementById('statusCursor').textContent = 'Ln ' + e.position.lineNumber + ', Col ' + e.position.column;
     });
     editor.onDidChangeModelContent(() => {
       if (state.activeFile) {
@@ -439,7 +395,6 @@
         renderTabs();
       }
     });
-    // Keyboard shortcuts
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => saveFile());
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyN, () => newFile());
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Backquote, () => toggleBottomPanel());
@@ -451,20 +406,23 @@
     if (!state.openFiles.includes(path)) state.openFiles.push(path);
     state.activeFile = path;
     state.language = getFileLanguage(path);
-
     if (editor) {
-      const model = monaco.editor.createModel(state.files[path], state.language);
+      let model = editor.getModel();
+      if (!model || model.isDisposed()) {
+        model = monaco.editor.createModel(state.files[path], state.language);
+      } else {
+        model.setValue(state.files[path]);
+        monaco.editor.setModelLanguage(model, state.language);
+      }
       editor.setModel(model);
     }
-
     document.getElementById('welcomeScreen').style.display = 'none';
-    document.getElementById('monacoContainer').style.display = 'block';
-    document.getElementById('blockEditorContainer').style.display = 'none';
+    document.getElementById('monacoContainer').style.display = state.viewMode === 'blocks' ? 'none' : 'block';
     document.getElementById('statusLanguage').textContent = state.language.charAt(0).toUpperCase() + state.language.slice(1);
     document.getElementById('statusFile').textContent = getFileName(path);
-
-    renderTabs();
-    renderFileTree();
+    renderTabs(); renderFileTree();
+    saveState();
+    setTimeout(() => { if (editor) editor.layout(); }, 50);
   }
 
   function closeFile(path) {
@@ -472,11 +430,9 @@
     state.modified.delete(path);
     if (state.activeFile === path) {
       state.activeFile = state.openFiles[state.openFiles.length - 1] || null;
-      if (state.activeFile) openFile(state.activeFile);
-      else showWelcome();
+      if (state.activeFile) openFile(state.activeFile); else showWelcome();
     }
-    renderTabs();
-    renderFileTree();
+    renderTabs(); renderFileTree();
   }
 
   function showWelcome() {
@@ -484,14 +440,15 @@
     document.getElementById('welcomeScreen').style.display = 'flex';
     document.getElementById('monacoContainer').style.display = 'none';
     document.getElementById('blockEditorContainer').style.display = 'none';
+    document.getElementById('splitDivider').style.display = 'none';
     document.getElementById('statusFile').textContent = 'Sin archivo';
   }
 
   function saveFile() {
     if (!state.activeFile) return;
     state.modified.delete(state.activeFile);
-    renderTabs();
-    notify('Archivo guardado', 'success');
+    state.files[state.activeFile] = editor ? editor.getValue() : (state.files[state.activeFile] || '');
+    renderTabs(); saveState(); notify('Archivo guardado', 'success');
   }
 
   function newFile() {
@@ -499,46 +456,30 @@
     if (!name) return;
     const path = 'mi-proyecto/' + name;
     state.files[path] = '';
-    renderFileTree();
-    openFile(path);
+    renderFileTree(); saveFile(); openFile(path); saveState();
   }
 
-  function newFolder() {
-    const name = prompt('Nombre de la carpeta:', 'nueva-carpeta');
-    if (!name) return;
-    state.files['mi-proyecto/' + name + '/'] = null;
-    renderFileTree();
-  }
-
-  // ── Tabs ───────────────────────────────────────────────────────────
   function renderTabs() {
     const bar = document.getElementById('tabsBar');
     bar.innerHTML = state.openFiles.map(path => {
       const name = getFileName(path);
       const active = path === state.activeFile ? ' active' : '';
       const modified = state.modified.has(path) ? '<span class="modified"></span>' : '';
-      return `<div class="tab${active}" onclick="openFile('${path}')">
-        <span>${getFileIcon(path)} ${name}</span>${modified}
-        <button class="close" onclick="event.stopPropagation();closeFile('${path}')">×</button>
-      </div>`;
+      return '<div class="tab' + active + '" onclick="openFile(\'' + path + '\')">' +
+        '<span>' + getFileIcon(path) + ' ' + name + '</span>' + modified +
+        '<button class="close" onclick="event.stopPropagation();closeFile(\'' + path + '\')">&times;</button></div>';
     }).join('');
   }
 
-  // ── Sidebar Panels ─────────────────────────────────────────────────
+  // ── Panels ──
   function switchPanel(panel) {
     state.sidebarPanel = panel;
+    saveState();
     document.querySelectorAll('.activity-btn').forEach(b => b.classList.toggle('active', b.dataset.panel === panel));
-
-    const titles = { explorer: 'Explorador', blocks: 'Bloques', search: 'Buscar', community: 'Comunidad', extensions: 'Plugins', settings: 'Configuración' };
+    const titles = { explorer:'Explorador', blocks:'Bloques', search:'Buscar', community:'Comunidad', extensions:'Plugins', settings:'Configuracion' };
     document.getElementById('sidebarTitle').textContent = titles[panel] || panel;
-
     const actions = document.getElementById('sidebarActions');
-    if (panel === 'explorer') {
-      actions.innerHTML = '<button onclick="newFile()" title="Nuevo archivo">+</button><button onclick="newFolder()" title="Nueva carpeta">📁</button>';
-    } else {
-      actions.innerHTML = '';
-    }
-
+    actions.innerHTML = panel === 'explorer' ? '<button onclick="newFile()" title="Nuevo archivo">+</button><button onclick="exportProject()" title="Exportar proyecto">&#128229;</button><button onclick="importProject()" title="Importar proyecto">&#128228;</button>' : '';
     renderSidebarContent();
   }
 
@@ -554,35 +495,45 @@
     }
   }
 
-  // ── Blocks Palette ─────────────────────────────────────────────────
+  // ── Blocks Palette ──
   function renderBlocksPalette(container) {
-    const categories = E.blockLibrary.getAllCategories();
-    let html = '';
-    categories.forEach(cat => {
-      const blocks = E.blockLibrary.getCategoryBlocks(cat);
+    let cats;
+    try { cats = E.blockLibrary ? E.blockLibrary.getAllCategories() : []; } catch(e) { cats = []; }
+    let html = '<div class="panel-content">';
+    if (cats.length === 0) {
+      html += '<p style="color:var(--text3);font-size:11px;padding:8px">Motor no cargado. Los bloques requieren engine.js.</p>';
+    }
+    cats.forEach(cat => {
+      let blocks;
+      try { blocks = E.blockLibrary.getCategoryBlocks(cat); } catch(e) { blocks = []; }
       if (!blocks.length) return;
-      html += `<div class="block-cat" style="color:${blocks[0]?.color || '#888'}">${cat.toUpperCase()}</div>`;
+      html += '<div class="block-cat" style="color:' + (blocks[0] ? blocks[0].color : '#888') + '">' + cat.toUpperCase() + '</div>';
       blocks.forEach(b => {
-        html += `<div class="block-item" draggable="true" ondragstart="dragBlock(event,'${b.id}')" onclick="addBlockToCanvas('${b.id}')">`;
-        html += `<div class="block-dot" style="background:${b.color}"></div>`;
-        html += `<span>${b.label}</span>`;
-        html += '</div>';
+        html += '<div class="block-item" draggable="true" ondragstart="dragBlockStart(event,\'' + b.id + '\')" onclick="addBlockToCanvas(\'' + b.id + '\')">';
+        html += '<div class="block-dot" style="background:' + b.color + '"></div><span>' + b.label + '</span></div>';
       });
     });
+    html += '</div>';
     container.innerHTML = html;
   }
 
+  function dragBlockStart(e, blockId) {
+    e.dataTransfer.setData('text/plain', blockId);
+    e.dataTransfer.effectAllowed = 'copy';
+  }
+
   function addBlockToCanvas(blockId) {
-    const def = E.blockLibrary.getBlock(blockId);
+    let def;
+    try { def = E.blockLibrary.getBlock(blockId); } catch(e) { return; }
     if (!def) return;
+    saveBlockSnapshot();
+    const canvas = document.getElementById('blockEditorContainer');
+    const rect = canvas.getBoundingClientRect();
     const node = {
-      id: 'node-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
+      id: 'n' + Date.now() + Math.random().toString(36).substr(2, 4),
       type: 'block',
-      position: { x: 40, y: 20 + state.blockNodes.length * 60 },
-      data: {
-        blockType: def.id, label: def.label, color: def.color,
-        shape: def.shape, fields: {}, category: def.category,
-      },
+      position: { x: 20 + (state.blockNodes.length % 4) * 160, y: 20 + Math.floor(state.blockNodes.length / 4) * 70 },
+      data: { blockType: def.id, label: def.label, color: def.color, shape: def.shape, fields: {}, category: def.category },
     };
     state.blockNodes.push(node);
     if (state.blockNodes.length > 1) {
@@ -590,140 +541,218 @@
         id: 'e-' + state.blockNodes[state.blockNodes.length - 2].id + '-' + node.id,
         source: state.blockNodes[state.blockNodes.length - 2].id,
         target: node.id,
-        sourceHandle: 'next', targetHandle: 'prev',
       });
     }
+    renderBlockCanvas();
     syncBlocksToCode();
-    notify('Bloque añadido: ' + def.label, 'info');
-  }
-
-  function dragBlock(e, blockId) {
-    e.dataTransfer.setData('text/plain', blockId);
+    notify('Bloque: ' + def.label, 'info');
   }
 
   function syncBlocksToCode() {
+    if (!state.activeFile || !editor) return;
     try {
       const resolver = new E.BlockResolver();
       const ir = resolver.resolveNodes(state.blockNodes, state.blockEdges, state.language);
       const emitter = new E.MultiLanguageEmitter(state.language);
       const code = emitter.emit(ir);
-      if (editor) editor.setValue(code);
-      if (state.activeFile) state.files[state.activeFile] = code;
+      editor.setValue(code);
+      state.files[state.activeFile] = code;
+      state.modified.add(state.activeFile);
+      renderTabs();
     } catch (err) {
-      console.error('Blocks→Code error:', err);
+      console.error('Blocks->Code:', err);
+      notify('Error bloques->codigo: ' + err.message, 'error');
     }
   }
 
+  function saveBlockSnapshot() {
+    state.blockUndoStack.push({
+      nodes: JSON.parse(JSON.stringify(state.blockNodes)),
+      edges: JSON.parse(JSON.stringify(state.blockEdges)),
+    });
+    state.blockRedoStack = [];
+    if (state.blockUndoStack.length > 50) state.blockUndoStack.shift();
+  }
+  function undoBlocks() {
+    if (!state.blockUndoStack.length) return;
+    state.blockRedoStack.push({
+      nodes: JSON.parse(JSON.stringify(state.blockNodes)),
+      edges: JSON.parse(JSON.stringify(state.blockEdges)),
+    });
+    const snap = state.blockUndoStack.pop();
+    state.blockNodes = snap.nodes;
+    state.blockEdges = snap.edges;
+    renderBlockCanvas();
+    syncBlocksToCode();
+  }
+  function redoBlocks() {
+    if (!state.blockRedoStack.length) return;
+    state.blockUndoStack.push({
+      nodes: JSON.parse(JSON.stringify(state.blockNodes)),
+      edges: JSON.parse(JSON.stringify(state.blockEdges)),
+    });
+    const snap = state.blockRedoStack.pop();
+    state.blockNodes = snap.nodes;
+    state.blockEdges = snap.edges;
+    renderBlockCanvas();
+    syncBlocksToCode();
+  }
+
+  let blockZoom = 1;
+
   function syncCodeToBlocks() {
+    if (!state.activeFile || !editor) return;
     try {
-      const code = editor ? editor.getValue() : '';
+      const code = editor.getValue();
       let ir;
-      if (state.language === 'python') {
-        ir = new E.PythonParser().parse(code, state.language);
-      } else if (state.language === 'javascript') {
-        ir = new E.JavaScriptParser().parse(code, state.language);
-      } else if (state.language === 'batch') {
-        ir = new E.BatchParser().parse(code, state.language);
-      } else {
-        notify('Conversión no disponible para ' + state.language, 'error');
-        return;
-      }
+      if (state.language === 'python') ir = new E.PythonParser().parse(code, state.language);
+      else if (state.language === 'javascript') ir = new E.JavaScriptParser().parse(code, state.language);
+      else if (state.language === 'batch') ir = new E.BatchParser().parse(code, state.language);
+      else { notify('Sin parser para ' + state.language, 'error'); return; }
       const converter = new E.IRToBlocksConverter();
-      const { nodes, edges } = converter.convert(ir);
-      state.blockNodes = nodes;
-      state.blockEdges = edges;
+      const result = converter.convert(ir);
+      state.blockNodes = result.nodes || [];
+      state.blockEdges = result.edges || [];
       renderBlockCanvas();
+      notify('Codigo->bloques: ' + state.blockNodes.length + ' bloques', 'success');
     } catch (err) {
-      console.error('Code→Blocks error:', err);
+      console.error('Code->Blocks:', err);
+      notify('Error codigo->bloques: ' + err.message, 'error');
     }
   }
 
   function renderBlockCanvas() {
     const container = document.getElementById('blockEditorContainer');
-    if (state.viewMode === 'blocks' || state.viewMode === 'split') {
-      container.innerHTML = '';
-      container.style.display = 'flex';
-      container.style.flexDirection = 'row';
+    if (state.viewMode !== 'blocks' && state.viewMode !== 'split') return;
+    container.innerHTML = '';
+    container.style.display = 'flex';
+    container.style.flexDirection = 'row';
 
-      // Palette
-      const palette = document.createElement('div');
-      palette.className = 'block-palette';
-      renderBlocksPalette(palette);
-      container.appendChild(palette);
+    // Palette inside block editor
+    const palette = document.createElement('div');
+    palette.className = 'block-palette';
+    renderBlocksPalette(palette);
+    container.appendChild(palette);
 
-      // Canvas
-      const canvas = document.createElement('div');
-      canvas.className = 'block-canvas';
-      canvas.id = 'blockDropCanvas';
-      canvas.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
-      canvas.addEventListener('drop', e => {
+    // Canvas
+    const canvas = document.createElement('div');
+    canvas.className = 'block-canvas';
+    canvas.id = 'blockDropCanvas';
+    canvas.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
+    canvas.addEventListener('drop', e => {
+      e.preventDefault();
+      const blockId = e.dataTransfer.getData('text/plain');
+      if (blockId) addBlockToCanvas(blockId);
+    });
+    canvas.addEventListener('wheel', (e) => {
+      if (e.ctrlKey) {
         e.preventDefault();
-        const blockId = e.dataTransfer.getData('text/plain');
-        if (blockId) addBlockToCanvas(blockId);
+        blockZoom = Math.max(0.3, Math.min(3, blockZoom + (e.deltaY > 0 ? -0.05 : 0.05)));
+        canvas.style.transform = 'scale(' + blockZoom + ')';
+        canvas.style.transformOrigin = '0 0';
+      }
+    });
+
+    // Render edges as SVG
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible';
+    state.blockEdges.forEach(edge => {
+      const src = state.blockNodes.find(n => n.id === edge.source);
+      const tgt = state.blockNodes.find(n => n.id === edge.target);
+      if (!src || !tgt) return;
+      const sx = src.position.x + 70, sy = src.position.y + 42;
+      const tx = tgt.position.x + 70, ty = tgt.position.y;
+      const path = document.createElementNS(svgNS, 'path');
+      path.setAttribute('d', 'M ' + sx + ' ' + sy + ' C ' + sx + ' ' + (sy + 20) + ' ' + tx + ' ' + (ty - 20) + ' ' + tx + ' ' + ty);
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', '#D4C5B5');
+      path.setAttribute('stroke-width', '2');
+      path.setAttribute('stroke-dasharray', '6 3');
+      svg.appendChild(path);
+    });
+    canvas.appendChild(svg);
+
+    // Render nodes
+    state.blockNodes.forEach(node => {
+      const el = document.createElement('div');
+      el.className = 'block-node';
+      el.style.left = node.position.x + 'px';
+      el.style.top = node.position.y + 'px';
+      el.style.background = node.data.color || '#888';
+      el.textContent = node.data.label || node.data.blockType;
+      el.dataset.nodeId = node.id;
+
+      // Double-click to edit label
+      el.addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = node.data.label || node.data.blockType;
+        input.style.cssText = 'background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.6);color:#fff;font-size:12px;font-weight:600;text-align:center;width:100%;outline:none;padding:0';
+        el.textContent = '';
+        el.appendChild(input);
+        input.focus();
+        input.select();
+        const commit = () => {
+          node.data.label = input.value || node.data.blockType;
+          renderBlockCanvas();
+          syncBlocksToCode();
+        };
+        input.addEventListener('blur', commit);
+        input.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter') { ev.preventDefault(); commit(); }
+          if (ev.key === 'Escape') { input.value = node.data.label; commit(); }
+        });
       });
 
-      // Render blocks as SVG
-      const svgNS = 'http://www.w3.org/2000/svg';
-      const svg = document.createElementNS(svgNS, 'svg');
-      svg.style.width = '100%';
-      svg.style.minHeight = (state.blockNodes.length * 70 + 100) + 'px';
+      // Delete button
+      const del = document.createElement('button');
+      del.className = 'delete-btn';
+      del.innerHTML = '&times;';
+      del.onclick = (e) => {
+        e.stopPropagation();
+        saveBlockSnapshot();
+        state.blockNodes = state.blockNodes.filter(n => n.id !== node.id);
+        state.blockEdges = state.blockEdges.filter(ed => ed.source !== node.id && ed.target !== node.id);
+        renderBlockCanvas();
+        syncBlocksToCode();
+      };
+      el.appendChild(del);
 
-      state.blockNodes.forEach((node, i) => {
-        const def = E.blockLibrary.getBlock(node.data.blockType);
-        if (!def) return;
-        const y = i * 60;
-        const w = 220, h = 40;
-
-        // Shadow
-        const shadow = document.createElementNS(svgNS, 'rect');
-        shadow.setAttribute('x', 42); shadow.setAttribute('y', y + 22);
-        shadow.setAttribute('width', w); shadow.setAttribute('height', h);
-        shadow.setAttribute('rx', 8); shadow.setAttribute('fill', 'rgba(0,0,0,0.08)');
-        svg.appendChild(shadow);
-
-        // Body
-        const rect = document.createElementNS(svgNS, 'rect');
-        rect.setAttribute('x', 40); rect.setAttribute('y', y + 20);
-        rect.setAttribute('width', w); rect.setAttribute('height', h);
-        rect.setAttribute('rx', 8); rect.setAttribute('fill', def.color);
-        rect.setAttribute('stroke', '#fff'); rect.setAttribute('stroke-width', '1.5');
-        rect.style.cursor = 'grab';
-        svg.appendChild(rect);
-
-        // Label
-        const text = document.createElementNS(svgNS, 'text');
-        text.setAttribute('x', 150); text.setAttribute('y', y + 45);
-        text.setAttribute('text-anchor', 'middle'); text.setAttribute('fill', '#fff');
-        text.setAttribute('font-family', 'Inter, sans-serif'); text.setAttribute('font-size', '13');
-        text.setAttribute('font-weight', '600');
-        text.textContent = def.label;
-        svg.appendChild(text);
-
-        // Edge to next
-        if (i > 0) {
-          const line = document.createElementNS(svgNS, 'path');
-          const prevY = (i - 1) * 60 + 40;
-          line.setAttribute('d', `M 150 ${prevY + 20} C 150 ${prevY + 40} 150 ${y} 150 ${y + 20}`);
-          line.setAttribute('fill', 'none'); line.setAttribute('stroke', '#D4C5B5');
-          line.setAttribute('stroke-width', '2');
-          svg.appendChild(line);
-        }
+      // Drag to move
+      el.addEventListener('mousedown', (e) => {
+        if (e.target === del) return;
+        e.preventDefault();
+        saveBlockSnapshot();
+        state.dragBlock = node;
+        state.dragOffset = { x: e.clientX - node.position.x, y: e.clientY - node.position.y };
+        el.style.cursor = 'grabbing';
       });
 
-      canvas.appendChild(svg);
-      container.appendChild(canvas);
-    }
+      canvas.appendChild(el);
+    });
+
+    document.onmousemove = (e) => {
+      if (!state.dragBlock) return;
+      state.dragBlock.position.x = e.clientX - state.dragOffset.x;
+      state.dragBlock.position.y = e.clientY - state.dragOffset.y;
+      renderBlockCanvas();
+    };
+    document.onmouseup = () => {
+      if (state.dragBlock) {
+        state.dragBlock = null;
+        syncBlocksToCode();
+      }
+    };
+
+    container.appendChild(canvas);
   }
 
-  // ── Search ─────────────────────────────────────────────────────────
+  // ── Search ──
   function renderSearchPanel(container) {
-    container.innerHTML = `
-      <div class="search-panel">
-        <input class="search-input" placeholder="Buscar en archivos..." oninput="doSearch(this.value)">
-        <div class="search-results" id="searchResults"></div>
-      </div>`;
+    container.innerHTML = '<div class="panel-content"><input class="search-input" placeholder="Buscar en archivos..." oninput="doSearch(this.value)"><div id="searchResults" style="margin-top:6px"></div></div>';
   }
-
   function doSearch(query) {
     const results = document.getElementById('searchResults');
     if (!query || query.length < 2) { results.innerHTML = ''; return; }
@@ -731,56 +760,40 @@
     let html = '';
     Object.keys(state.files).forEach(path => {
       if (path.endsWith('/')) return;
-      const content = state.files[path];
-      const lines = content.split('\n');
+      const lines = state.files[path].split('\n');
       lines.forEach((line, i) => {
         if (line.toLowerCase().includes(q)) {
-          html += `<div class="search-result" onclick="openFile('${path}')">
-            <span class="file">${getFileName(path)}</span>
-            <span class="line">:${i + 1}</span>
-            <span>${line.trim().substring(0, 60)}</span>
-          </div>`;
+          html += '<div class="search-result" onclick="openFile(\'' + path + '\')"><span style="color:var(--accent);font-weight:500">' + getFileName(path) + '</span><span style="color:var(--text3);margin-left:4px">:' + (i+1) + '</span> <span style="color:var(--text2)">' + line.trim().substring(0, 50) + '</span></div>';
         }
       });
     });
-    results.innerHTML = html || '<div style="padding:12px;color:var(--text3);font-size:12px">Sin resultados</div>';
+    results.innerHTML = html || '<div style="padding:8px;color:var(--text3);font-size:11px">Sin resultados</div>';
   }
 
-  // ── Community Panel ────────────────────────────────────────────────
-  let communityPosts = [];
-
+  // ── Community ──
   async function renderCommunityPanel(container) {
-    container.innerHTML = '<div class="community-panel"><p style="color:var(--text3);font-size:12px">Cargando comunidad...</p></div>';
+    container.innerHTML = '<div class="panel-content"><p style="color:var(--text3);font-size:11px">Cargando...</p></div>';
+    let posts = [];
     try {
       const res = await fetch(API_BASE + '/api/posts');
       const data = await res.json();
-      communityPosts = data.posts || [];
-    } catch (e) {
-      communityPosts = [];
-    }
-
-    let html = '<div class="community-panel">';
-    html += '<h4>Foro de Plugins</h4>';
-
-    if (communityPosts.length === 0) {
-      html += '<div class="upload-zone" onclick="uploadPlugin()"><p>📤 Sé el primero en publicar</p><p style="margin-top:4px">Sube tu plugin desde el foro web</p></div>';
-      html += '<p style="color:var(--text3);font-size:12px;text-align:center;padding:20px">Aún no hay plugins.<br><a href="../#foro" target="_blank" style="color:var(--accent)">Ir al foro →</a></p>';
+      posts = data.posts || [];
+    } catch (e) { /* server down */ }
+    let html = '<div class="panel-content"><h4>Foro de Plugins</h4>';
+    if (posts.length === 0) {
+      html += '<p style="color:var(--text3);font-size:11px;text-align:center;padding:16px">Sin publicaciones.<br><a href="../#foro" target="_blank" style="color:var(--accent)">Ir al foro</a></p>';
     } else {
-      html += '<div style="margin-bottom:8px;font-size:11px;color:var(--text3)">' + communityPosts.length + ' publicaciones</div>';
-      communityPosts.slice(0, 20).forEach(p => {
+      html += '<div style="font-size:10px;color:var(--text3);margin-bottom:6px">' + posts.length + ' publicaciones</div>';
+      posts.slice(0, 20).forEach(p => {
         const date = new Date(p.createdAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
-        html += '<div class="plugin-card" onclick="installPostPlugin(\'' + p.id + '\')">' +
-          '<div class="name">' + (p.title || p.displayName || p.name) + '</div>' +
-          '<div class="author">por ' + (p.author || 'Anónimo') + ' · ' + date + '</div>' +
-          '<div class="desc">' + (p.description || 'Sin descripción').substring(0, 80) + '</div>' +
-          '<div class="meta">' +
-          '<span>⬇ ' + (p.downloads || 0) + '</span>' +
-          '<span>💬 ' + (p.comments || []).length + '</span>' +
-          '<span>❤ ' + (p.likes || 0) + '</span>' +
-          '</div></div>';
+        html += '<div class="plugin-card" onclick="installPostPlugin(\'' + p.id + '\')">';
+        html += '<div class="name">' + (p.title || '') + '</div>';
+        html += '<div class="author">por ' + (p.author || 'Anonimo') + ' - ' + date + '</div>';
+        html += '<div class="desc">' + (p.description || '').substring(0, 80) + '</div>';
+        html += '<div class="meta"><span>&#11015; ' + (p.downloads || 0) + '</span><span>&#128172; ' + (p.comments || []).length + '</span><span>&#10084; ' + (p.likes || 0) + '</span></div></div>';
       });
     }
-    html += '</div>';
+    html += '<div style="text-align:center;margin-top:8px"><a href="../#foro" target="_blank" style="color:var(--accent);font-size:11px">Abrir foro completo &rarr;</a></div></div>';
     container.innerHTML = html;
   }
 
@@ -789,374 +802,201 @@
       const res = await fetch(API_BASE + '/api/posts/' + id);
       const data = await res.json();
       const post = data.post;
-      if (!post || !post.fileName) {
-        notify('Este plugin no tiene archivo adjunto', 'error');
-        return;
-      }
-      // Download and execute
+      if (!post || !post.fileName) { notify('Sin archivo adjunto', 'error'); return; }
       const dlRes = await fetch(API_BASE + '/api/posts/' + id + '/download');
       const code = await dlRes.text();
-      try {
-        const fn = new Function(code);
-        fn();
-        notify('Plugin instalado: ' + post.title, 'success');
-      } catch (e) {
-        notify('Error al ejecutar plugin: ' + e.message, 'error');
-      }
+      const path = 'mi-proyecto/plugins/' + (post.title.replace(/[^a-zA-Z0-9]/g, '_') || 'plugin') + '.js';
+      state.files[path] = code;
+      openFile(path);
+      notify('Plugin: ' + post.title, 'success');
     } catch (e) {
       notify('Error al descargar plugin', 'error');
     }
   }
 
-  function uploadPlugin() {
-    window.open('../#foro', '_blank');
-  }
-
-  // ── Extensions Panel ───────────────────────────────────────────────
+  // ── Extensions ──
   function renderExtensionsPanel(container) {
-    container.innerHTML = `
-      <div class="community-panel">
-        <h4>Plugins</h4>
-        <div class="upload-zone" onclick="uploadPlugin()">
-          <p>📤 Publicar Plugin</p>
-          <p style="margin-top:4px;font-size:11px">Ir al foro para publicar</p>
-        </div>
-        <div id="myPluginsList" style="margin-top:8px"></div>
-      </div>`;
-    loadMyPlugins();
+    container.innerHTML = '<div class="panel-content"><h4>Plugins</h4><p style="font-size:11px;color:var(--text2);margin-bottom:8px">Publica y descarga plugins desde el foro.</p><a href="../#foro" target="_blank" style="display:inline-block;padding:6px 12px;background:var(--accent);color:#fff;border-radius:6px;font-size:11px;text-decoration:none;font-weight:500">Abrir Foro</a></div>';
   }
 
-  async function loadMyPlugins() {
-    try {
-      const res = await fetch(API_BASE + '/api/posts');
-      const data = await res.json();
-      const list = document.getElementById('myPluginsList');
-      if (!list) return;
-      if (!data.posts || data.posts.length === 0) {
-        list.innerHTML = '<p style="color:var(--text3);font-size:12px;text-align:center;padding:16px">No hay plugins. <a href="../#foro" target="_blank" style="color:var(--accent)">Ir al foro</a></p>';
-        return;
-      }
-      list.innerHTML = data.posts.map(p => `
-        <div class="plugin-card" onclick="installPostPlugin('${p.id}')">
-          <div class="name">${p.title}</div>
-          <div class="desc">${p.description || 'Sin descripción'}</div>
-          <div class="meta"><span>⬇ ${p.downloads || 0}</span><span>💬 ${(p.comments||[]).length}</span></div>
-        </div>
-      `).join('');
-    } catch (e) { /* ignore */ }
-  }
-
-  // ── Settings ───────────────────────────────────────────────────────
+  // ── Settings ──
   function renderSettingsPanel(container) {
-    container.innerHTML = `
-      <div class="settings-panel">
-        <div class="settings-group">
-          <label>Idioma del código</label>
-          <select onchange="changeLanguage(this.value)">
-            <option value="javascript" ${state.language === 'javascript' ? 'selected' : ''}>JavaScript</option>
-            <option value="python" ${state.language === 'python' ? 'selected' : ''}>Python</option>
-            <option value="batch" ${state.language === 'batch' ? 'selected' : ''}>Batch</option>
-          </select>
-        </div>
-        <div class="settings-group">
-          <label>Tamaño de fuente</label>
-          <input type="range" min="10" max="22" value="14" onchange="changeFontSize(this.value)">
-        </div>
-        <div class="settings-group">
-          <label>Tamaño de tabulación</label>
-          <select onchange="changeTabSize(this.value)">
-            <option value="2">2 espacios</option>
-            <option value="4" selected>4 espacios</option>
-          </select>
-        </div>
-        <div class="settings-group">
-          <label>UI Idioma</label>
-          <select onchange="setUILanguage(this.value)">
-            <option value="es">Español</option>
-            <option value="en">English</option>
-          </select>
-        </div>
-      </div>`;
+    container.innerHTML = '<div class="panel-content"><div class="settings-group"><label>Idioma del codigo</label><select onchange="changeLanguage(this.value)"><option value="javascript"' + (state.language==='javascript'?' selected':'') + '>JavaScript</option><option value="python"' + (state.language==='python'?' selected':'') + '>Python</option><option value="batch"' + (state.language==='batch'?' selected':'') + '>Batch</option></select></div><div class="settings-group"><label>Tamano de fuente</label><input type="range" min="10" max="22" value="13" onchange="changeFontSize(this.value)"></div><div class="settings-group"><label>Tab</label><select onchange="changeTabSize(this.value)"><option value="2">2 espacios</option><option value="4" selected>4 espacios</option></select></div></div>';
   }
-
   function changeLanguage(lang) {
     state.language = lang;
-    if (editor && state.activeFile) {
-      monaco.editor.setModelLanguage(editor.getModel(), lang);
-    }
+    if (editor && state.activeFile) monaco.editor.setModelLanguage(editor.getModel(), lang);
     document.getElementById('statusLanguage').textContent = lang.charAt(0).toUpperCase() + lang.slice(1);
-    notify('Lenguaje: ' + lang, 'info');
   }
+  function changeFontSize(size) { if (editor) editor.updateOptions({ fontSize: parseInt(size) }); }
+  function changeTabSize(size) { if (editor) editor.updateOptions({ tabSize: parseInt(size) }); }
 
-  function changeFontSize(size) {
-    if (editor) editor.updateOptions({ fontSize: parseInt(size) });
-  }
-
-  function changeTabSize(size) {
-    if (editor) editor.updateOptions({ tabSize: parseInt(size) });
-  }
-
-  function setUILanguage(lang) {
-    localStorage.setItem('lc-ui-lang', lang);
-    notify('Idioma UI: ' + (lang === 'es' ? 'Español' : 'English'), 'info');
-  }
-
-  // ── View Modes ─────────────────────────────────────────────────────
+  // ── View Modes ──
   function setViewMode(mode) {
     state.viewMode = mode;
-    document.querySelectorAll('.view-mode-btn').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase().includes(mode === 'code' ? 'código' : mode === 'blocks' ? 'bloques' : 'dividir')));
-
+    saveState();
+    document.querySelectorAll('.view-mode-btn').forEach(b => {
+      const txt = b.textContent.toLowerCase();
+      b.classList.toggle('active', (mode === 'code' && txt.includes('codigo')) || (mode === 'blocks' && txt.includes('bloques')) || (mode === 'split' && txt.includes('dividir')));
+    });
     const monacoEl = document.getElementById('monacoContainer');
     const blockEl = document.getElementById('blockEditorContainer');
-
+    const divider = document.getElementById('splitDivider');
     switch (mode) {
       case 'code':
-        monacoEl.style.display = 'block';
+        monacoEl.style.display = state.activeFile ? 'block' : 'none';
         blockEl.style.display = 'none';
+        divider.style.display = 'none';
         if (editor) editor.layout();
         break;
       case 'blocks':
         monacoEl.style.display = 'none';
         blockEl.style.display = 'flex';
-        syncCodeToBlocks();
+        divider.style.display = 'none';
+        if (state.activeFile) syncCodeToBlocks();
+        else renderBlockCanvas();
         break;
       case 'split':
-        monacoEl.style.display = 'block';
+        monacoEl.style.display = state.activeFile ? 'block' : 'none';
         monacoEl.style.flex = '1';
+        monacoEl.style.minWidth = '0';
         blockEl.style.display = 'flex';
         blockEl.style.flex = '1';
-        syncCodeToBlocks();
+        blockEl.style.minWidth = '0';
+        divider.style.display = 'block';
+        if (state.activeFile) syncCodeToBlocks();
+        else renderBlockCanvas();
         if (editor) editor.layout();
         break;
     }
   }
 
-  // ── Terminal ───────────────────────────────────────────────────────
-  let terminal = null;
-  let fitAddon = null;
-  let termHistory = [];
-  let historyIndex = -1;
-  let currentInput = '';
+  // ── Terminal ──
+  let terminal = null, fitAddon = null, termHistory = [], historyIdx = -1, lineBuf = '';
 
   function initTerminal() {
     terminal = new Terminal({
-      theme: {
-        background: '#FFFCF5', foreground: '#1F2937',
-        cursor: '#C96B4B', cursorAccent: '#FFFCF5',
-        selectionBackground: '#C96B4B33',
-      },
-      fontFamily: "'JetBrains Mono', monospace", fontSize: 13,
-      cursorBlink: true,
+      theme: { background: '#FFFCF5', foreground: '#1F2937', cursor: '#C96B4B', selectionBackground: '#C96B4B33' },
+      fontFamily: "'JetBrains Mono', monospace", fontSize: 12, cursorBlink: true,
     });
     fitAddon = new FitAddon.FitAddon();
     terminal.loadAddon(fitAddon);
     terminal.open(document.getElementById('terminalContainer'));
     fitAddon.fit();
-
-    terminal.writeln('\x1b[33mLibre Código Web Terminal v0.1.0\x1b[0m');
-    terminal.writeln('\x1b[90mEscribe "help" para ver los comandos disponibles\x1b[0m');
+    terminal.writeln('\x1b[33mLibre Codigo Web Terminal v0.1.0\x1b[0m');
+    terminal.writeln('\x1b[90mEscribe "help" para ver comandos\x1b[0m');
     terminal.write('\r\n\x1b[36m$\x1b[0m ');
-
-    let lineBuffer = '';
     terminal.onKey(({ key, domEvent }) => {
       const ev = domEvent;
       if (ev.key === 'Enter') {
         terminal.writeln('');
-        if (lineBuffer.trim()) {
-          termHistory.push(lineBuffer);
-          historyIndex = termHistory.length;
-          executeTerminalCommand(lineBuffer.trim());
-        }
-        lineBuffer = '';
+        if (lineBuf.trim()) { termHistory.push(lineBuf); historyIdx = termHistory.length; execTerm(lineBuf.trim()); }
+        lineBuf = '';
         terminal.write('\x1b[36m$\x1b[0m ');
       } else if (ev.key === 'Backspace') {
-        if (lineBuffer.length > 0) {
-          lineBuffer = lineBuffer.slice(0, -1);
-          terminal.write('\b \b');
-        }
+        if (lineBuf.length > 0) { lineBuf = lineBuf.slice(0, -1); terminal.write('\b \b'); }
       } else if (ev.key === 'ArrowUp') {
-        if (historyIndex > 0) {
-          historyIndex--;
-          clearLine();
-          lineBuffer = termHistory[historyIndex];
-          terminal.write(lineBuffer);
-        }
+        if (historyIdx > 0) { historyIdx--; clearTL(); lineBuf = termHistory[historyIdx]; terminal.write(lineBuf); }
       } else if (ev.key === 'ArrowDown') {
-        if (historyIndex < termHistory.length - 1) {
-          historyIndex++;
-          clearLine();
-          lineBuffer = termHistory[historyIndex];
-          terminal.write(lineBuffer);
-        } else {
-          historyIndex = termHistory.length;
-          clearLine();
-          lineBuffer = '';
-        }
-      } else if (ev.key === 'l' && ev.ctrlKey) {
-        terminal.clear();
-        terminal.write('\x1b[36m$\x1b[0m ');
-        lineBuffer = '';
+        if (historyIdx < termHistory.length - 1) { historyIdx++; clearTL(); lineBuf = termHistory[historyIdx]; terminal.write(lineBuf); }
+        else { historyIdx = termHistory.length; clearTL(); lineBuf = ''; }
       } else if (ev.key.length === 1 && !ev.ctrlKey && !ev.altKey && !ev.metaKey) {
-        lineBuffer += key;
-        terminal.write(key);
+        lineBuf += key; terminal.write(key);
       }
     });
-
-    function clearLine() {
-      for (let i = 0; i < lineBuffer.length; i++) terminal.write('\b \b');
-    }
+    function clearTL() { for (let i = 0; i < lineBuf.length; i++) terminal.write('\b \b'); }
   }
 
-  function executeTerminalCommand(cmd) {
+  function execTerm(cmd) {
     const parts = cmd.split(/\s+/);
-    const command = parts[0].toLowerCase();
-    const args = parts.slice(1);
-
-    switch (command) {
+    const c = parts[0].toLowerCase(), a = parts.slice(1);
+    switch (c) {
       case 'help':
-        terminal.writeln('  Comandos disponibles:');
-        terminal.writeln('  help          Mostrar esta ayuda');
+        terminal.writeln('  help          Mostrar ayuda');
         terminal.writeln('  ls            Listar archivos');
         terminal.writeln('  cat <archivo> Mostrar contenido');
-        terminal.writeln('  pwd           Directorio actual');
-        terminal.writeln('  echo <texto>  Imprimir texto');
-        terminal.writeln('  clear         Limpiar terminal');
         terminal.writeln('  run           Ejecutar archivo actual');
         terminal.writeln('  newfile <n>   Crear archivo');
-        terminal.writeln('  mkdir <n>     Crear carpeta');
-        terminal.writeln('  date          Fecha y hora');
-        terminal.writeln('  whoami        Usuario');
-        terminal.writeln('  history       Historial');
-        terminal.writeln('  code2blocks   Sincronizar código → bloques');
-        terminal.writeln('  blocks2code   Sincronizar bloques → código');
-        terminal.writeln('  parse         Parsear y mostrar IR');
+        terminal.writeln('  clear         Limpiar terminal');
+        terminal.writeln('  code2blocks   Codigo -> bloques');
+        terminal.writeln('  blocks2code   Bloques -> codigo');
+        terminal.writeln('  parse         Mostrar IR');
         break;
       case 'ls':
-        const files = Object.keys(state.files).filter(f => !f.endsWith('/')).map(getFileName);
-        terminal.writeln('  ' + files.join('  '));
+        terminal.writeln('  ' + Object.keys(state.files).filter(f => !f.endsWith('/')).map(getFileName).join('  '));
         break;
       case 'cat':
-        if (!args[0]) { terminal.writeln('  Uso: cat <archivo>'); break; }
-        const path = Object.keys(state.files).find(f => f.endsWith(args[0]));
-        if (path && state.files[path]) {
-          state.files[path].split('\n').forEach(l => terminal.writeln('  ' + l));
-        } else {
-          terminal.writeln('\x1b[31m  Archivo no encontrado: ' + args[0] + '\x1b[0m');
-        }
+        if (!a[0]) { terminal.writeln('  Uso: cat <archivo>'); break; }
+        const fp = Object.keys(state.files).find(f => f.endsWith(a[0]));
+        if (fp && state.files[fp]) state.files[fp].split('\n').forEach(l => terminal.writeln('  ' + l));
+        else terminal.writeln('\x1b[31m  No encontrado: ' + a[0] + '\x1b[0m');
         break;
-      case 'pwd':
-        terminal.writeln('  /mi-proyecto');
-        break;
-      case 'echo':
-        terminal.writeln('  ' + args.join(' '));
-        break;
-      case 'clear':
-        terminal.clear();
-        break;
-      case 'date':
-        terminal.writeln('  ' + new Date().toLocaleString('es-ES'));
-        break;
-      case 'whoami':
-        terminal.writeln('  user@librecodigo');
-        break;
-      case 'history':
-        termHistory.forEach((h, i) => terminal.writeln('  ' + (i + 1) + '  ' + h));
-        break;
+      case 'clear': terminal.clear(); break;
       case 'newfile':
-        if (!args[0]) { terminal.writeln('  Uso: newfile <nombre>'); break; }
-        state.files['mi-proyecto/' + args[0]] = '';
-        terminal.writeln('  Archivo creado: ' + args[0]);
-        renderFileTree();
-        break;
-      case 'mkdir':
-        if (!args[0]) { terminal.writeln('  Uso: mkdir <nombre>'); break; }
-        state.files['mi-proyecto/' + args[0] + '/'] = null;
-        terminal.writeln('  Carpeta creada: ' + args[0]);
-        renderFileTree();
+        if (!a[0]) { terminal.writeln('  Uso: newfile <nombre>'); break; }
+        state.files['mi-proyecto/' + a[0]] = '';
+        terminal.writeln('  Creado: ' + a[0]); renderFileTree();
         break;
       case 'run':
-        if (!state.activeFile) { terminal.writeln('\x1b[31m  No hay archivo abierto\x1b[0m'); break; }
+        if (!state.activeFile) { terminal.writeln('\x1b[31m  Sin archivo abierto\x1b[0m'); break; }
         if (state.language === 'javascript') {
           terminal.writeln('\x1b[90m  Ejecutando ' + getFileName(state.activeFile) + '...\x1b[0m');
-          const outputContainer = document.getElementById('outputContainer');
-          let output = '';
           const origLog = console.log;
-          console.log = (...a) => { output += a.join(' ') + '\n'; terminal.writeln('  ' + a.join(' ')); };
-          try {
-            eval(state.files[state.activeFile]);
-            outputContainer.textContent += '\n[OK] ' + new Date().toLocaleTimeString();
-          } catch (e) {
-            terminal.writeln('\x1b[31m  Error: ' + e.message + '\x1b[0m');
-            outputContainer.textContent += '\n[ERROR] ' + e.message;
-          }
+          console.log = (...a) => terminal.writeln('  ' + a.join(' '));
+          try { eval(state.files[state.activeFile]); terminal.writeln('\x1b[32m  OK\x1b[0m'); }
+          catch (e) { terminal.writeln('\x1b[31m  Error: ' + e.message + '\x1b[0m'); }
           console.log = origLog;
-        } else if (state.language === 'python') {
-          terminal.writeln('\x1b[33m  Python no disponible en versión web. Usa la app de escritorio.\x1b[0m');
-        } else if (state.language === 'batch') {
-          terminal.writeln('\x1b[33m  Batch no disponible en versión web. Usa la app de escritorio.\x1b[0m');
+        } else {
+          terminal.writeln('\x1b[33m  Solo JavaScript disponible en web\x1b[0m');
         }
         break;
-      case 'code2blocks':
-        syncCodeToBlocks();
-        terminal.writeln('\x1b[32m  Sincronizado código → bloques\x1b[0m');
-        break;
-      case 'blocks2code':
-        syncBlocksToCode();
-        terminal.writeln('\x1b[32m  Sincronizado bloques → código\x1b[0m');
-        break;
+      case 'code2blocks': syncCodeToBlocks(); terminal.writeln('\x1b[32m  Sincronizado\x1b[0m'); break;
+      case 'blocks2code': syncBlocksToCode(); terminal.writeln('\x1b[32m  Sincronizado\x1b[0m'); break;
       case 'parse':
-        if (!editor) { terminal.writeln('\x1b[31m  No hay código para parsear\x1b[0m'); break; }
+        if (!editor) { terminal.writeln('\x1b[31m  Sin codigo\x1b[0m'); break; }
         try {
           const code = editor.getValue();
           let ir;
           if (state.language === 'python') ir = new E.PythonParser().parse(code, state.language);
           else if (state.language === 'javascript') ir = new E.JavaScriptParser().parse(code, state.language);
           else if (state.language === 'batch') ir = new E.BatchParser().parse(code, state.language);
-          else { terminal.writeln('\x1b[31m  Parser no disponible para ' + state.language + '\x1b[0m'); break; }
-          terminal.writeln('\x1b[32m  IR generado: ' + ir.stmts.length + ' declaraciones\x1b[0m');
-          ir.stmts.forEach(s => terminal.writeln('  → ' + s.kind));
-        } catch (err) {
-          terminal.writeln('\x1b[31m  Error de parseo: ' + err.message + '\x1b[0m');
-        }
+          else { terminal.writeln('\x1b[31m  Sin parser\x1b[0m'); break; }
+          terminal.writeln('\x1b[32m  IR: ' + (ir.stmts ? ir.stmts.length : 0) + ' declaraciones\x1b[0m');
+          if (ir.stmts) ir.stmts.forEach(s => terminal.writeln('  -> ' + s.kind));
+        } catch (err) { terminal.writeln('\x1b[31m  Error: ' + err.message + '\x1b[0m'); }
         break;
-      default:
-        terminal.writeln('\x1b[31m  Comando no encontrado: ' + command + '\x1b[0m');
-        terminal.writeln('  Escribe "help" para ver los comandos disponibles');
+      default: terminal.writeln('\x1b[31m  Desconocido: ' + c + '\x1b[0m');
     }
   }
 
-  // ── Bottom Panel ───────────────────────────────────────────────────
   function switchBottomTab(tab) {
     state.bottomTab = tab;
     document.querySelectorAll('.bottom-tab').forEach(b => b.classList.toggle('active', b.dataset.btab === tab));
     document.getElementById('terminalContainer').style.display = tab === 'terminal' ? 'block' : 'none';
     document.getElementById('outputContainer').style.display = tab === 'output' ? 'block' : 'none';
-    document.getElementById('problemsContainer').style.display = tab === 'problems' ? 'block' : 'none';
     if (tab === 'terminal' && fitAddon) fitAddon.fit();
   }
-
   function toggleBottomPanel() {
     state.bottomOpen = !state.bottomOpen;
+    saveState();
     document.getElementById('bottomPanel').classList.toggle('collapsed', !state.bottomOpen);
-    setTimeout(() => { if (fitAddon) fitAddon.fit(); if (editor) editor.layout(); }, 200);
+    setTimeout(() => { if (fitAddon) fitAddon.fit(); if (editor) editor.layout(); }, 150);
   }
-
   function toggleSidebar() {
     state.sidebarOpen = !state.sidebarOpen;
+    saveState();
     document.getElementById('sidebar').classList.toggle('collapsed', !state.sidebarOpen);
-    setTimeout(() => { if (editor) editor.layout(); }, 200);
+    setTimeout(() => { if (editor) editor.layout(); }, 150);
   }
 
-  // ── Notifications ──────────────────────────────────────────────────
-  function notify(message, type) {
+  function notify(msg, type) {
     const el = document.createElement('div');
     el.className = 'notification ' + (type || 'info');
-    el.textContent = message;
+    el.textContent = msg;
     document.getElementById('notifications').appendChild(el);
     setTimeout(() => el.remove(), 3000);
   }
 
-  // ── Context Menu ───────────────────────────────────────────────────
   function showFileContextMenu(e, path) {
     e.preventDefault();
     removeContextMenu();
@@ -1164,83 +1004,141 @@
     menu.className = 'context-menu';
     menu.style.left = e.clientX + 'px';
     menu.style.top = e.clientY + 'px';
-
     const items = [
-      { label: '📂 Abrir', action: () => openFile(path) },
-      { label: '✏️ Renombrar', action: () => renameFile(path) },
+      { label: 'Abrir', action: () => openFile(path) },
+      { label: 'Renombrar', action: () => renameFile(path) },
       null,
-      { label: '🗑️ Eliminar', action: () => deleteFile(path), danger: true },
+      { label: 'Eliminar', action: () => deleteFile(path), danger: true },
     ];
-
     items.forEach(item => {
-      if (item === null) {
-        menu.innerHTML += '<div class="context-menu-divider"></div>';
-        return;
-      }
+      if (item === null) { menu.innerHTML += '<div class="context-menu-divider"></div>'; return; }
       const el = document.createElement('div');
       el.className = 'context-menu-item' + (item.danger ? ' danger' : '');
       el.textContent = item.label;
       el.onclick = () => { removeContextMenu(); item.action(); };
       menu.appendChild(el);
     });
-
     document.body.appendChild(menu);
     document.addEventListener('click', removeContextMenu, { once: true });
   }
-
-  function removeContextMenu() {
-    document.querySelectorAll('.context-menu').forEach(m => m.remove());
-  }
-
+  function removeContextMenu() { document.querySelectorAll('.context-menu').forEach(m => m.remove()); }
   function renameFile(path) {
-    const newName = prompt('Nuevo nombre:', getFileName(path));
-    if (!newName || newName === getFileName(path)) return;
+    const n = prompt('Nuevo nombre:', getFileName(path));
+    if (!n || n === getFileName(path)) return;
     const dir = path.split('/').slice(0, -1).join('/');
-    const newPath = dir + '/' + newName;
+    const newPath = dir + '/' + n;
     state.files[newPath] = state.files[path];
     delete state.files[path];
     if (state.activeFile === path) {
-      state.activeFile = newPath;
       state.openFiles = state.openFiles.map(f => f === path ? newPath : f);
-      state.modified.delete(path);
-      state.modified.add(newPath);
+      state.activeFile = newPath;
       openFile(newPath);
     }
     renderFileTree();
   }
-
   function deleteFile(path) {
-    if (!confirm('¿Eliminar ' + getFileName(path) + '?')) return;
+    if (!confirm('Eliminar ' + getFileName(path) + '?')) return;
     delete state.files[path];
-    closeFile(path);
-    renderFileTree();
+    closeFile(path); renderFileTree();
   }
 
-  // ── Keyboard Shortcuts ─────────────────────────────────────────────
   document.addEventListener('keydown', e => {
     if (e.ctrlKey && e.key === '`') { e.preventDefault(); toggleBottomPanel(); }
     if (e.ctrlKey && e.key === 'b') { e.preventDefault(); toggleSidebar(); }
     if (e.ctrlKey && e.key === '1') { e.preventDefault(); setViewMode('code'); }
     if (e.ctrlKey && e.key === '2') { e.preventDefault(); setViewMode('blocks'); }
     if (e.ctrlKey && e.key === '3') { e.preventDefault(); setViewMode('split'); }
+    if (e.ctrlKey && e.key === 'z' && !e.shiftKey) { e.preventDefault(); undoBlocks(); }
+    if (e.ctrlKey && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) { e.preventDefault(); redoBlocks(); }
   });
 
   function newProject() {
     const name = prompt('Nombre del proyecto:', 'mi-proyecto');
     if (!name) return;
     Object.keys(state.files).forEach(k => delete state.files[k]);
-    state.files[name + '/'] = null;
-    state.files[name + '/main.js'] = '// ' + name + '\nfunction main() {\n    console.log("¡Hola!");\n}\n\nmain();\n';
-    state.openFiles = [];
-    state.activeFile = null;
-    state.modified.clear();
-    showWelcome();
-    renderFileTree();
-    document.getElementById('projectTitle').textContent = 'Libre Código — ' + name;
-    notify('Proyecto creado: ' + name, 'success');
+    state.files[name + '/main.js'] = '// ' + name + '\nfunction main() {\n    console.log("Hola!");\n}\n\nmain();\n';
+    state.openFiles = []; state.activeFile = null; state.modified.clear();
+    state.blockNodes = []; state.blockEdges = [];
+    showWelcome(); renderFileTree();
+    document.getElementById('projectTitle').textContent = 'Libre Codigo - ' + name;
+    notify('Proyecto: ' + name, 'success');
   }
 
-  // ── Init ───────────────────────────────────────────────────────────
+  function exportProject() {
+    const blob = new Blob([JSON.stringify({ files: state.files }, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'libre-codigo-project.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    notify('Proyecto exportado', 'success');
+  }
+
+  function importProject() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if (data.files && typeof data.files === 'object') {
+            Object.keys(state.files).forEach(k => delete state.files[k]);
+            Object.assign(state.files, data.files);
+            state.openFiles = []; state.activeFile = null; state.modified.clear();
+            showWelcome(); renderFileTree(); saveState();
+            notify('Proyecto importado: ' + Object.keys(data.files).length + ' archivos', 'success');
+          }
+        } catch (err) { notify('Error importando: ' + err.message, 'error'); }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  }
+
+  // ── Resize handling ──
+  window.addEventListener('resize', () => {
+    if (editor) editor.layout();
+    if (fitAddon) fitAddon.fit();
+  });
+
+  // ── Split divider drag ──
+  (function initSplitDrag() {
+    const divider = document.getElementById('splitDivider');
+    const monacoEl = document.getElementById('monacoContainer');
+    const blockEl = document.getElementById('blockEditorContainer');
+    let dragging = false;
+    divider.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      dragging = true;
+      document.body.style.cursor = 'ew-resize';
+      document.body.style.userSelect = 'none';
+    });
+    document.addEventListener('mousemove', (e) => {
+      if (!dragging) return;
+      const container = document.getElementById('editorContent');
+      const rect = container.getBoundingClientRect();
+      const offsetX = e.clientX - rect.left;
+      const total = rect.width - 3;
+      const pct = Math.max(20, Math.min(80, (offsetX / total) * 100));
+      monacoEl.style.flex = 'none';
+      monacoEl.style.width = pct + '%';
+      blockEl.style.flex = 'none';
+      blockEl.style.width = (100 - pct) + '%';
+      if (editor) editor.layout();
+    });
+    document.addEventListener('mouseup', () => {
+      if (!dragging) return;
+      dragging = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    });
+  })();
+
+  // ── Init ──
   initFileSystem();
   renderFileTree();
   initTerminal();

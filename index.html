@@ -250,19 +250,26 @@ footer ul a:hover{color:var(--accent)}
       <i data-lucide="hard-drive" style="width:20px;height:20px;color:var(--accent)"></i>
       <div style="text-align:left">
         <div style="font-size:0.92rem;font-weight:600">Windows (EXE)</div>
-        <div style="font-size:0.78rem;color:#888">Libre-Codigo-0.1.0-x64-setup.exe · 3.9 MB</div>
+        <div style="font-size:0.78rem;color:#888">Libre-Codigo-0.1.0-windows-x64.zip — 3.9 MB</div>
       </div>
     </div>
     <div style="background:#fff;border:1px solid #eee;border-radius:12px;padding:14px 24px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08)">
       <i data-lucide="hard-drive" style="width:20px;height:20px;color:var(--accent)"></i>
       <div style="text-align:left">
         <div style="font-size:0.92rem;font-weight:600">Windows (MSI)</div>
-        <div style="font-size:0.78rem;color:#888">Libre-Codigo-0.1.0-x64.msi · 6.3 MB</div>
+        <div style="font-size:0.78rem;color:#888">Libre-Codigo-0.1.0-windows-x64-msi.zip — 6.1 MB</div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #eee;border-radius:12px;padding:14px 24px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08)">
+      <i data-lucide="hard-drive" style="width:20px;height:20px;color:var(--accent)"></i>
+      <div style="text-align:left">
+        <div style="font-size:0.92rem;font-weight:600">Linux (AppImage)</div>
+        <div style="font-size:0.78rem;color:#888">Libre-Codigo-0.1.0-linux-amd64-appimage.zip — 78.6 MB</div>
       </div>
     </div>
   </div>
   <div class="hero-btns fade-in">
-    <a href="downloads/Libre-Codigo-0.1.0-x64-setup.exe" class="btn btn-primary"><i data-lucide="download" style="width:18px;height:18px"></i> Descargar para Windows</a>
+    <a href="https://drive.google.com/uc?export=download&id=1g8ETzdKubgf57JByXo6spTVs3r5fEuWB" class="btn btn-primary"><i data-lucide="download" style="width:18px;height:18px"></i> Descargar para Windows</a>
     <a href="web/index.html" class="btn btn-outline"><i data-lucide="play" style="width:18px;height:18px"></i> Probar en el Navegador</a>
   </div>
 </section>
@@ -423,7 +430,7 @@ footer ul a:hover{color:var(--accent)}
         }).join('');
         if (typeof lucide !== 'undefined') lucide.createIcons();
       } catch (e) {
-        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#888;font-size:14px">Inicia el servidor para ver los plugins: <code>npm start</code></div>';
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#888;font-size:14px">No se pudieron cargar los plugins del servidor.<br><span style="font-size:12px;color:#aaa;margin-top:4px;display:block">' + e.message + '</span></div>';
       }
       function escH(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
     })();
@@ -446,16 +453,30 @@ footer ul a:hover{color:var(--accent)}
           <tr>
             <td>0.1 Alpha</td>
             <td><i data-lucide="monitor" style="width:16px;height:16px;vertical-align:middle;margin-right:6px"></i> Windows</td>
-            <td style="font-size:0.82rem;color:#666">Libre-Codigo-0.1.0-x64-setup.exe<br><span style="color:#999">3.9 MB</span></td>
+            <td style="font-size:0.82rem;color:#666">Libre-Codigo-0.1.0-windows-x64.zip<br><span style="color:#999">3.9 MB — NSIS Installer</span></td>
             <td><span class="badge green">Disponible</span></td>
-            <td><a href="downloads/Libre-Codigo-0.1.0-x64-setup.exe" class="btn btn-primary btn-sm" style="text-decoration:none"><i data-lucide="download" style="width:14px;height:14px"></i> Descargar</a></td>
+            <td><a href="https://drive.google.com/uc?export=download&id=1g8ETzdKubgf57JByXo6spTVs3r5fEuWB" class="btn btn-primary btn-sm" style="text-decoration:none"><i data-lucide="download" style="width:14px;height:14px"></i> Descargar</a></td>
+          </tr>
+          <tr>
+            <td>0.1 Alpha</td>
+            <td><i data-lucide="monitor" style="width:16px;height:16px;vertical-align:middle;margin-right:6px"></i> Windows</td>
+            <td style="font-size:0.82rem;color:#666">Libre-Codigo-0.1.0-windows-x64-msi.zip<br><span style="color:#999">6.1 MB — MSI Installer</span></td>
+            <td><span class="badge green">Disponible</span></td>
+            <td><a href="https://drive.google.com/uc?export=download&id=1FpVLw8zmEcHZ-TUd891EdGi03PuKxxm0" class="btn btn-primary btn-sm" style="text-decoration:none"><i data-lucide="download" style="width:14px;height:14px"></i> Descargar</a></td>
           </tr>
           <tr>
             <td>0.1 Alpha</td>
             <td><i data-lucide="terminal" style="width:16px;height:16px;vertical-align:middle;margin-right:6px"></i> Linux</td>
-            <td style="font-size:0.82rem;color:#666">Libre-Codigo-0.1.0-linux-x64.AppImage</td>
+            <td style="font-size:0.82rem;color:#666">Libre-Codigo-0.1.0-linux-amd64.zip<br><span style="color:#999">4.5 MB — Debian Package</span></td>
             <td><span class="badge green">Disponible</span></td>
-            <td><a href="downloads/Libre-Codigo-0.1.0-linux-x64.AppImage" class="btn btn-primary btn-sm" style="text-decoration:none"><i data-lucide="download" style="width:14px;height:14px"></i> Descargar</a></td>
+            <td><a href="https://drive.google.com/uc?export=download&id=17dWrjylM1y0TIcie8ONpXeVf8QMEK35I" class="btn btn-primary btn-sm" style="text-decoration:none"><i data-lucide="download" style="width:14px;height:14px"></i> Descargar</a></td>
+          </tr>
+          <tr>
+            <td>0.1 Alpha</td>
+            <td><i data-lucide="terminal" style="width:16px;height:16px;vertical-align:middle;margin-right:6px"></i> Linux</td>
+            <td style="font-size:0.82rem;color:#666">Libre-Codigo-0.1.0-linux-amd64-appimage.zip<br><span style="color:#999">78.6 MB — AppImage</span></td>
+            <td><span class="badge green">Disponible</span></td>
+            <td><a href="https://drive.google.com/uc?export=download&id=1Cs_9f_1dUKq2buDFzOjls-S6-_cmehRF" class="btn btn-primary btn-sm" style="text-decoration:none"><i data-lucide="download" style="width:14px;height:14px"></i> Descargar</a></td>
           </tr>
         </tbody>
       </table>
@@ -652,19 +673,18 @@ footer ul a:hover{color:var(--accent)}
       <div>
         <h4>Recursos</h4>
         <ul>
-          <li><a href="#">GitHub</a></li>
-          <li><a href="#">Changelog</a></li>
-          <li><a href="#">Licencia</a></li>
-          <li><a href="#">Contacto</a></li>
+          <li><a href="https://github.com" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="#builds">Changelog</a></li>
+          <li><a href="sdk/index.html">SDK Docs</a></li>
+          <li><a href="api/index.html">API Docs</a></li>
         </ul>
       </div>
     </div>
     <div class="footer-bottom">
-      <span>&copy; 2026 Libre Código. Todos los derechos reservados.</span>
+      <span>&copy; 2026 Libre Codigo. Todos los derechos reservados.</span>
       <div class="social-icons">
-        <a href="#" aria-label="GitHub"><i data-lucide="github" style="width:16px;height:16px"></i></a>
-        <a href="#" aria-label="Twitter"><i data-lucide="twitter" style="width:16px;height:16px"></i></a>
-        <a href="#" aria-label="Discord"><i data-lucide="message-square" style="width:16px;height:16px"></i></a>
+        <a href="https://github.com" target="_blank" rel="noopener" aria-label="GitHub"><i data-lucide="github" style="width:16px;height:16px"></i></a>
+        <a href="web/index.html" aria-label="Web IDE"><i data-lucide="globe" style="width:16px;height:16px"></i></a>
       </div>
     </div>
   </div>
@@ -711,6 +731,10 @@ document.getElementById('submitPostBtn').addEventListener('click', async () => {
 
   try {
     const res = await fetch(API + '/api/posts', { method: 'POST', body: formData });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({ error: 'Error del servidor (' + res.status + ')' }));
+      throw new Error(errData.error || 'Error ' + res.status);
+    }
     const data = await res.json();
     if (data.success) {
       document.getElementById('modalOverlay').classList.remove('active');
@@ -721,28 +745,33 @@ document.getElementById('submitPostBtn').addEventListener('click', async () => {
       document.getElementById('postFile').value = '';
       loadForum();
     } else {
-      alert('Error: ' + (data.error || 'Unknown'));
+      alert('Error: ' + (data.error || 'Respuesta inesperada'));
     }
   } catch (e) {
-    alert('Error de conexión. ¿Está corriendo el servidor? (npm start)');
+    alert('Error al publicar: ' + e.message);
   }
   btn.textContent = 'Publicar';
   btn.disabled = false;
 });
 
 // ── Load Forum ──
+let forumPage = 1;
+const FORUM_PER_PAGE = 5;
+
 async function loadForum() {
   const container = document.getElementById('forumPosts');
   const statsEl = document.getElementById('forumStats');
 
   try {
     const [postsRes, statsRes] = await Promise.all([
-      fetch(API + '/api/posts'),
+      fetch(API + '/api/posts?page=' + forumPage + '&perPage=' + FORUM_PER_PAGE),
       fetch(API + '/api/stats'),
     ]);
     const postsData = await postsRes.json();
     const statsData = await statsRes.json();
     const posts = postsData.posts || [];
+    const totalPages = postsData.totalPages || 1;
+    const total = postsData.total || 0;
 
     statsEl.innerHTML = '<span>📝 ' + statsData.total + ' publicaciones</span><span>⬇ ' + statsData.totalDownloads + ' descargas</span><span>💬 ' + statsData.totalComments + ' comentarios</span><span>👁 ' + statsData.totalViews + ' vistas</span>';
 
@@ -782,8 +811,17 @@ async function loadForum() {
 
     if (typeof lucide !== 'undefined') lucide.createIcons();
     document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    if (totalPages > 1) {
+      let paginationHtml = '<div style="display:flex;justify-content:center;align-items:center;gap:8px;margin-top:24px">';
+      paginationHtml += '<button class="btn btn-outline btn-sm" onclick="forumPage=' + Math.max(1, forumPage - 1) + ';loadForum()" ' + (forumPage <= 1 ? 'disabled style="opacity:0.4"' : '') + '>&#8592; Anterior</button>';
+      paginationHtml += '<span style="font-size:13px;color:#888">Página ' + forumPage + ' de ' + totalPages + ' (' + total + ' publicaciones)</span>';
+      paginationHtml += '<button class="btn btn-outline btn-sm" onclick="forumPage=' + Math.min(totalPages, forumPage + 1) + ';loadForum()" ' + (forumPage >= totalPages ? 'disabled style="opacity:0.4"' : '') + '>Siguiente &#8594;</button>';
+      paginationHtml += '</div>';
+      container.innerHTML += paginationHtml;
+    }
   } catch (e) {
-    container.innerHTML = '<div style="text-align:center;padding:40px;color:#888"><p>No se pudo conectar al servidor.</p><p style="margin-top:8px;font-size:13px">Ejecuta: <code style="background:#F0E6D8;padding:2px 8px;border-radius:4px">npm start</code></p></div>';
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:#888"><p>No se pudo conectar con el servidor.</p><p style="margin-top:8px;font-size:13px">Asegúrate de que el servidor esté corriendo en <code style="background:#F0E6D8;padding:2px 8px;border-radius:4px">' + API + '</code></p><p style="margin-top:4px;font-size:12px;color:#aaa">' + e.message + '</p></div>';
   }
 }
 

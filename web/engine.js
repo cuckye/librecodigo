@@ -8416,8 +8416,10 @@ ${c.body}
   var BlockResolver = class {
     constructor() {
       __publicField(this, "declaredVars", /* @__PURE__ */ new Set());
+      __publicField(this, "nodeMap", /* @__PURE__ */ new Map());
     }
     resolveNodes(nodes, edges, language) {
+      this.nodeMap = new Map(nodes.map((n) => [n.id, n]));
       const sorted = this.topologicalSort(nodes, edges);
       const stmts = [];
       for (const node of sorted) {
@@ -8788,8 +8790,8 @@ ${c.body}
       }
       return inputs;
     }
-    findSourceNode(_sourceId) {
-      return null;
+    findSourceNode(sourceId) {
+      return this.nodeMap.get(sourceId) ?? null;
     }
     topologicalSort(nodes, edges) {
       const adj = /* @__PURE__ */ new Map();
